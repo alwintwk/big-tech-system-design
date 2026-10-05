@@ -33,24 +33,15 @@ Step by step:
 4. If it has seen the key before, it does **not** repeat the operation — it just returns the exact result it stored the first time, even if that first attempt actually failed (so a client retrying a `500` gets the same `500` back, not a fresh, possibly-different attempt).
 5. Keys are typically retained only for a bounded window (Stripe uses roughly 24 hours) — after that, reusing the same key starts a genuinely new request rather than replaying anything.
 
-```mermaid
-sequenceDiagram
-  participant C as Client
-  participant S as Server
-  participant Store as Idempotency key store
+<a href="https://alwintwk.github.io/big-tech-system-design/diagrams/concepts-idempotency-retry.html">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../diagrams/concepts-idempotency-retry.dark.png">
+    <img alt="Sequence: 1 client POSTs with a key, 2 server asks the key store, 3 not seen, 4 result saved, 5 200 OK; response lost, 6 client retries with same key, 7 server asks again, 8 key found, 9 stored result replayed without charging again" src="../diagrams/concepts-idempotency-retry.light.png">
+  </picture>
+</a>
 
-  C->>S: POST /charge (key=abc-123)
-  S->>Store: has key abc-123 been seen?
-  Store-->>S: no
-  S->>S: perform charge
-  S->>Store: save result for key abc-123
-  S-->>C: 200 OK (charged)
-  Note over C,S: Network drops the response before client sees it — client retries
-  C->>S: POST /charge (same key=abc-123)
-  S->>Store: has key abc-123 been seen?
-  Store-->>S: yes, result = 200 OK
-  S-->>C: 200 OK (replayed, card NOT charged again)
-```
+
+<sub>Click the diagram for the interactive version (zoom, dark mode, trace a path).</sub>
 
 > **Why this matters:** notice the client never learns whether its first request actually succeeded before it retried — and it doesn't need to. The key store is the single source of truth for "did this already happen," so the client's own uncertainty about the network is completely absorbed by the server-side check, not left for the client to somehow resolve itself.
 

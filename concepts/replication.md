@@ -29,24 +29,15 @@ Step by step (leader-based replication, the most common form):
 4. Reads can be served by the leader (always current) or by a follower (faster to scale out, but possibly a moment stale) — the choice is a direct trade against [consistency](cap-and-consistency.md).
 5. If the leader dies, one follower is promoted to take its place — this is **failover** — and clients need to learn the new leader's address before writes can resume.
 
-```mermaid
-sequenceDiagram
-  participant L as Leader
-  participant F1 as Follower 1
-  participant F2 as Follower 2
+<a href="https://alwintwk.github.io/big-tech-system-design/diagrams/concepts-replication-sync-async.html">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../diagrams/concepts-replication-sync-async.dark.png">
+    <img alt="Sequence: synchronous 1 write, 2-3 replicate to followers, 4-5 acks, 6 confirm only now; asynchronous 7 write, 8 confirm at once, 9 replicate later" src="../diagrams/concepts-replication-sync-async.light.png">
+  </picture>
+</a>
 
-  Note over L,F2: Synchronous replication (safer, slower)
-  L->>F1: replicate write
-  L->>F2: replicate write
-  F1-->>L: ack
-  F2-->>L: ack
-  L-->>L: only now confirm write to client
 
-  Note over L,F2: Asynchronous replication (faster, riskier)
-  L->>F1: replicate write
-  L->>F2: replicate write
-  L-->>L: confirm write to client immediately, without waiting
-```
+<sub>Click the diagram for the interactive version (zoom, dark mode, trace a path).</sub>
 
 > **Why this matters:** these two diagrams show exactly where the risk window is. In the synchronous version, the client is only told "success" after replicas actually have the data — nothing is lost even if the leader vanishes the instant after. In the asynchronous version, there's a real gap between "client was told it worked" and "a replica actually has it" — a crash inside that gap is a genuine, permanent loss of the most recent writes.
 

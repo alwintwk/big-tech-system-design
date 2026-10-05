@@ -1,0 +1,171 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Payment system: one safe charge",
+    "quality_profile": "showcase",
+    "output": "diagrams/problems-payment-system-charge.html",
+    "legend": {
+      "entries": {
+        "external": {
+          "label": "Card network / bank"
+        },
+        "security": {
+          "label": "Rate limit"
+        },
+        "backend": {
+          "label": "Payment steps"
+        },
+        "database": {
+          "label": "Stores"
+        },
+        "messagebus": {
+          "label": "Event bus"
+        }
+      }
+    }
+  },
+  "lanes": [
+    {
+      "id": "a",
+      "label": "Request path"
+    },
+    {
+      "id": "b",
+      "label": "Side steps"
+    }
+  ],
+  "mainPath": [
+    "rl",
+    "ps",
+    "nw",
+    "lg",
+    "ev",
+    "wh"
+  ],
+  "nodes": [
+    {
+      "id": "rl",
+      "lane": "a",
+      "col": 0,
+      "type": "security",
+      "label": "1. Rate limiter",
+      "sublabel": "every request, from the client",
+      "width": 170
+    },
+    {
+      "id": "ps",
+      "lane": "a",
+      "col": 1,
+      "type": "backend",
+      "label": "2. Idempotency check",
+      "sublabel": "seen this key before?",
+      "width": 170
+    },
+    {
+      "id": "nw",
+      "lane": "a",
+      "col": 2,
+      "type": "external",
+      "label": "3. Card network / bank",
+      "sublabel": "authorize the funds",
+      "width": 170
+    },
+    {
+      "id": "lg",
+      "lane": "a",
+      "col": 3,
+      "type": "database",
+      "label": "4. Write to ledger",
+      "sublabel": "debit + credit, atomic",
+      "width": 170
+    },
+    {
+      "id": "ev",
+      "lane": "a",
+      "col": 4,
+      "type": "messagebus",
+      "label": "5. Publish event",
+      "sublabel": "on the event bus",
+      "width": 170
+    },
+    {
+      "id": "rj",
+      "lane": "b",
+      "col": 0,
+      "type": "security",
+      "label": "429: rejected",
+      "sublabel": "over the limit",
+      "width": 170
+    },
+    {
+      "id": "ik",
+      "lane": "b",
+      "col": 1,
+      "type": "database",
+      "label": "Key store",
+      "sublabel": "replays saved result",
+      "width": 170
+    },
+    {
+      "id": "wh",
+      "lane": "b",
+      "col": 4,
+      "type": "backend",
+      "label": "6. Webhook to merchant",
+      "sublabel": "tells their server",
+      "width": 170
+    }
+  ],
+  "edges": [
+    {
+      "id": "rl-ps",
+      "from": "rl",
+      "to": "ps",
+      "label": "allowed",
+      "variant": "emphasis"
+    },
+    {
+      "id": "ps-nw",
+      "from": "ps",
+      "to": "nw",
+      "label": "new request",
+      "variant": "emphasis"
+    },
+    {
+      "id": "nw-lg",
+      "from": "nw",
+      "to": "lg",
+      "label": "success",
+      "variant": "emphasis"
+    },
+    {
+      "id": "lg-ev",
+      "from": "lg",
+      "to": "ev",
+      "label": "posted",
+      "variant": "emphasis"
+    },
+    {
+      "id": "ev-wh",
+      "from": "ev",
+      "to": "wh",
+      "variant": "emphasis"
+    },
+    {
+      "id": "rl-rj",
+      "from": "rl",
+      "to": "rj",
+      "label": "rejected",
+      "variant": "security",
+      "role": "error"
+    },
+    {
+      "id": "ps-ik",
+      "from": "ps",
+      "to": "ik",
+      "label": "check key",
+      "role": "branch"
+    }
+  ]
+}

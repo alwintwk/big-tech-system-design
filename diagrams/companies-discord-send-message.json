@@ -1,0 +1,155 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "Discord: sending one message",
+    "output": "diagrams/companies-discord-send-message.html",
+    "viewBox": [
+      1080,
+      498
+    ],
+    "column_fit": "spread",
+    "quality_profile": "showcase",
+    "legend": {
+      "entries": {
+        "default": {
+          "label": "Internal call"
+        },
+        "emphasis": {
+          "label": "Message flow"
+        },
+        "return": {
+          "label": "Reply / push"
+        }
+      }
+    }
+  },
+  "participants": [
+    {
+      "id": "c",
+      "type": "external",
+      "label": "Client",
+      "sublabel": "sender"
+    },
+    {
+      "id": "api",
+      "type": "backend",
+      "label": "HTTP API",
+      "sublabel": "Python"
+    },
+    {
+      "id": "ds",
+      "type": "backend",
+      "label": "Message service",
+      "sublabel": "Rust data layer"
+    },
+    {
+      "id": "scy",
+      "type": "database",
+      "label": "ScyllaDB",
+      "sublabel": "messages by channel"
+    },
+    {
+      "id": "g",
+      "type": "backend",
+      "label": "Guild process",
+      "sublabel": "Elixir, one per server"
+    },
+    {
+      "id": "mf",
+      "type": "messagebus",
+      "label": "Manifold",
+      "sublabel": "cluster fan-out"
+    },
+    {
+      "id": "s",
+      "type": "frontend",
+      "label": "Session process",
+      "sublabel": "one per user"
+    }
+  ],
+  "messages": [
+    {
+      "id": "m1",
+      "from": "c",
+      "to": "api",
+      "y": 170,
+      "label": "1. POST channel message",
+      "variant": "emphasis"
+    },
+    {
+      "id": "m2",
+      "from": "api",
+      "to": "ds",
+      "y": 198,
+      "label": "2. Save message (gRPC)",
+      "variant": "default"
+    },
+    {
+      "id": "m3",
+      "from": "ds",
+      "to": "scy",
+      "y": 226,
+      "label": "3. Insert by channel + time bucket",
+      "variant": "default"
+    },
+    {
+      "id": "m4",
+      "from": "scy",
+      "to": "ds",
+      "y": 254,
+      "label": "4. OK",
+      "variant": "return"
+    },
+    {
+      "id": "m5",
+      "from": "ds",
+      "to": "api",
+      "y": 282,
+      "label": "5. Message ID (Snowflake)",
+      "variant": "return"
+    },
+    {
+      "id": "m6",
+      "from": "api",
+      "to": "g",
+      "y": 310,
+      "label": "6. Publish MESSAGE_CREATE",
+      "variant": "emphasis"
+    },
+    {
+      "id": "m7",
+      "from": "g",
+      "to": "mf",
+      "y": 338,
+      "label": "7. Fan out to remote nodes",
+      "variant": "default"
+    },
+    {
+      "id": "m8",
+      "from": "mf",
+      "to": "s",
+      "y": 366,
+      "label": "8. Local delivery per node",
+      "variant": "default"
+    },
+    {
+      "id": "m9",
+      "from": "s",
+      "to": "c",
+      "y": 394,
+      "label": "9. WebSocket push",
+      "variant": "return"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Two jobs",
+      "items": [
+        "Store the message durably first",
+        "Then push it live to everyone online"
+      ]
+    }
+  ]
+}

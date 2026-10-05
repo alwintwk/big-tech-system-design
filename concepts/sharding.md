@@ -12,14 +12,15 @@ This is exactly the wall Instagram, Slack, and YouTube each hit: a single MySQL 
 
 ## How it works (step by step, with at least 2 Mermaid diagrams)
 
-```mermaid
-flowchart TD
-  Req["Write: save row for user_id=482913"] --> Router["Sharding key -> shard function<br/>e.g. hash(user_id) mod N"]
-  Router --> S0[("Shard 0")]
-  Router --> S1[("Shard 1")]
-  Router --> S2[("Shard 2")]
-  Router -.->|"routed to"| S1
-```
+<a href="https://alwintwk.github.io/big-tech-system-design/diagrams/concepts-sharding-route-write.html">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../diagrams/concepts-sharding-route-write.dark.png">
+    <img alt="Steps: 1 write a row, 2 compute the shard with hash(user_id) mod N, 3 route to Shard 1, 4 row saved on Shard 1; other shards untouched" src="../diagrams/concepts-sharding-route-write.light.png">
+  </picture>
+</a>
+
+
+<sub>Click the diagram for the interactive version (zoom, dark mode, trace a path).</sub>
 
 > **Why this matters:** the shard function is the entire contract. As long as `hash(user_id)` always produces the same answer for the same user, every write and every read for that user lands on the same shard forever — which is exactly what lets a stateless application server "just know" where to look, without asking anyone else first.
 

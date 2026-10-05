@@ -369,32 +369,14 @@ Walking through it:
 
 ### 1. Core booking flow
 
-```mermaid
-sequenceDiagram
-  participant G as Guest
-  participant FE as Frontend
-  participant BS as Booking Service
-  participant AS as Availability (Calendar)
-  participant PO as Payments Orchestrator
-  participant PSP as Payment Processor
-  participant LG as Ledger
-  participant H as Host
+<a href="https://alwintwk.github.io/big-tech-system-design/diagrams/companies-airbnb-booking.html">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../diagrams/companies-airbnb-booking.dark.png">
+    <img alt="Steps: 1. Request to book; 2. Create reservation request; 3. Hold the nights; 4. Nights held; 5. Charge (idempotency key); 6. Charge the card; 7. Payment authorized; 8. Record double-entry; 9. Payment captured; 10. Confirm nights as booked; 11. Reservation confirmed; 12. Confirmation shown" src="../diagrams/companies-airbnb-booking.light.png">
+  </picture>
+</a>
 
-  G->>FE: Request to book (listing, dates, guests)
-  FE->>BS: Create reservation request
-  BS->>AS: Hold nights (listing_id, date range)
-  AS-->>BS: Nights held (or conflict -> reject)
-  BS->>PO: Authorize + capture payment (idempotency key)
-  PO->>PSP: Charge card / wallet / local method
-  PSP-->>PO: Payment authorized
-  PO->>LG: Record double-entry (guest charge, host accrual, fee)
-  PO-->>BS: Payment captured
-  BS->>AS: Confirm nights as booked
-  BS-->>FE: Reservation confirmed
-  FE-->>G: Confirmation shown
-  BS-->>H: Notify host (async event)
-  LG-->>H: Payout released (T+ days after check-in)
-```
+<sub>Click the diagram for the interactive version (zoom, dark mode, trace a path).</sub>
 
 The two steps that matter most for correctness:
 

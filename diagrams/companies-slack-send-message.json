@@ -1,0 +1,142 @@
+{
+ "schema_version": 1,
+ "diagram_type": "sequence",
+ "meta": {
+  "title": "Slack: sending one message",
+  "output": "diagrams/companies-slack-send-message.html",
+  "viewBox": [
+   1080,
+   480
+  ],
+  "column_fit": "spread",
+  "quality_profile": "showcase",
+  "legend": {
+   "entries": {
+    "default": {
+     "label": "Internal hop"
+    },
+    "emphasis": {
+     "label": "Send / live push"
+    },
+    "return": {
+     "label": "Reply"
+    },
+    "dashed": {
+     "label": "Background jobs"
+    }
+   }
+  }
+ },
+ "participants": [
+  {
+   "id": "c",
+   "type": "external",
+   "label": "Sender client",
+   "sublabel": "HTTPS"
+  },
+  {
+   "id": "wa",
+   "type": "backend",
+   "label": "Webapp",
+   "sublabel": "PHP / Hack"
+  },
+  {
+   "id": "as",
+   "type": "backend",
+   "label": "Admin Server",
+   "sublabel": "stateless"
+  },
+  {
+   "id": "cs",
+   "type": "backend",
+   "label": "Channel Server",
+   "sublabel": "consistent hash ring"
+  },
+  {
+   "id": "gs",
+   "type": "messagebus",
+   "label": "Gateway Server",
+   "sublabel": "holds subscriptions"
+  },
+  {
+   "id": "r",
+   "type": "frontend",
+   "label": "Recipient",
+   "sublabel": "WebSocket"
+  }
+ ],
+ "messages": [
+  {
+   "id": "m1",
+   "from": "c",
+   "to": "wa",
+   "y": 170,
+   "label": "1. POST message",
+   "variant": "emphasis"
+  },
+  {
+   "id": "m2",
+   "from": "wa",
+   "to": "as",
+   "y": 198,
+   "label": "2. Forward message",
+   "variant": "default"
+  },
+  {
+   "id": "m3",
+   "from": "as",
+   "to": "cs",
+   "y": 226,
+   "label": "3. Write to channel (hash routed)",
+   "variant": "default"
+  },
+  {
+   "id": "m4",
+   "from": "cs",
+   "to": "as",
+   "y": 254,
+   "label": "4. Acknowledged",
+   "variant": "return"
+  },
+  {
+   "id": "m5",
+   "from": "wa",
+   "to": "as",
+   "y": 282,
+   "label": "5. Enqueue async jobs (search, notify)",
+   "variant": "dashed"
+  },
+  {
+   "id": "m6",
+   "from": "cs",
+   "to": "gs",
+   "y": 310,
+   "label": "6. Push to subscribed Gateways",
+   "variant": "emphasis"
+  },
+  {
+   "id": "m7",
+   "from": "gs",
+   "to": "r",
+   "y": 338,
+   "label": "7. Message event over WebSocket",
+   "variant": "return"
+  }
+ ],
+ "cards": [
+  {
+   "dot": "emerald",
+   "title": "Fast path",
+   "items": [
+    "Live delivery rides the Channel and Gateway servers"
+   ]
+  },
+  {
+   "dot": "orange",
+   "title": "Side jobs",
+   "items": [
+    "Search indexing and push notifications run through the job queue"
+   ]
+  }
+ ]
+}

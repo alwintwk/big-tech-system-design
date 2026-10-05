@@ -404,29 +404,14 @@ Walking through it:
 
 ### 1. Core flow: sending an encrypted message to a multi-device recipient
 
-```mermaid
-sequenceDiagram
-  participant SA as Sender device
-  participant Srv as WhatsApp server
-  participant KS as Key server
-  participant R1 as Recipient device 1 phone
-  participant R2 as Recipient device 2 linked desktop
+<a href="https://alwintwk.github.io/big-tech-system-design/diagrams/companies-whatsapp-send-message.html">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../diagrams/companies-whatsapp-send-message.dark.png">
+    <img alt="Steps: 1. Ask for recipient device list; 2. Fetch device list + prekeys; 3. Devices + public keys; 4. Device list + prekey bundles; 5. Send one ciphertext per device; 6. Deliver ciphertext; 7. Deliver ciphertext; 8. Delivery ack; 9. Relay acks (double tick)" src="../diagrams/companies-whatsapp-send-message.light.png">
+  </picture>
+</a>
 
-  SA->>Srv: Request recipient's device list
-  Srv->>KS: Fetch device list + prekey bundles
-  KS-->>Srv: R1, R2 plus public keys
-  Srv-->>SA: Device list + prekey bundles
-  SA->>SA: Encrypt message once per device, Double Ratchet session per device
-  SA->>Srv: Send N ciphertexts, client-fanout
-  Srv->>R1: Deliver ciphertext, online
-  Srv->>R2: Deliver ciphertext, online
-  R1-->>Srv: Delivery ack, double check mark
-  R2-->>Srv: Delivery ack
-  Srv-->>SA: Relay delivery acks
-  R1->>R1: User opens chat, decrypts
-  R1-->>Srv: Read receipt
-  Srv-->>SA: Read receipt, blue check marks
-```
+<sub>Click the diagram for the interactive version (zoom, dark mode, trace a path).</sub>
 
 This is the **client-fanout** model described in Meta's 2021 multi-device write-up: the sender does the encryption work once per recipient *device* (not once per recipient *person*), producing a separate ciphertext for the recipient's phone and for each linked companion device [1].
 
@@ -434,22 +419,12 @@ Group chats use the Signal Protocol's **Sender Key** scheme instead of full pair
 
 ### 2. Key agreement: establishing a session (X3DH)
 
-```mermaid
-sequenceDiagram
-  participant A as Device A, initiator
-  participant Srv as WhatsApp server
-  participant B as Device B, offline right now
-
-  Note over B: B pre-uploaded a prekey bundle,<br/>identity key plus signed prekey plus one-time prekey
-  A->>Srv: Fetch B's prekey bundle
-  Srv-->>A: Identity key, signed prekey, one-time prekey
-  A->>A: Run X3DH, derive shared secret from A's keys plus B's prekey bundle
-  A->>A: Initialize Double Ratchet session
-  A->>Srv: First message, tagged with A's ephemeral key
-  Srv->>B: Deliver first message, queued since B is offline
-  B->>B: B comes online, runs X3DH with same public values
-  B->>B: Both sides now share ratcheting session state
-```
+<a href="https://alwintwk.github.io/big-tech-system-design/diagrams/companies-whatsapp-key-agreement.html">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../diagrams/companies-whatsapp-key-agreement.dark.png">
+    <img alt="Steps: 1. Fetch B's prekey bundle; 2. Identity, signed + one-time prekey; 3. First message + A ephemeral key; 4. Deliver once B is online (queued)" src="../diagrams/companies-whatsapp-key-agreement.light.png">
+  </picture>
+</a>
 
 This is the **Signal Protocol**'s handshake, run once per device-pair: **X3DH** (Extended Triple Diffie-Hellman) lets A start an encrypted session with B even while B is completely offline, because B published prekeys in advance.
 

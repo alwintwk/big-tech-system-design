@@ -162,24 +162,15 @@ join at every feed open).
 
 ## 5. High-level design
 
-```mermaid
-flowchart LR
-  Client[Client] --> LB[Load balancer]
-  LB --> PostSvc[Post service]
-  LB --> FeedSvc[Feed service]
+<a href="https://alwintwk.github.io/big-tech-system-design/diagrams/problems-news-feed-post-fanout.html">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../diagrams/problems-news-feed-post-fanout.dark.png">
+    <img alt="Steps: 1 client posts, 2 post service saves and queues, 3 fan-out queue, 4 fan-out worker checks follower count, 5 pushes to follower timelines if under threshold, otherwise skipped and merged at read time" src="../diagrams/problems-news-feed-post-fanout.light.png">
+  </picture>
+</a>
 
-  PostSvc --> PostDB[(Post store<br/>sharded by author_id)]
-  PostSvc --> FanoutQ[[Fan-out queue]]
 
-  FanoutQ --> Fanout[Fan-out worker]
-  Fanout -->|"follower count under threshold"| Timeline[(Timeline cache<br/>sharded by owner_user_id)]
-  Fanout -->|"follower count over threshold"| Skip[Skip push, merge at read time]
-
-  FeedSvc --> Timeline
-  FeedSvc --> Ranker[Ranking service]
-  FeedSvc -->|"merge in high-follower authors"| PostDB
-  Ranker --> Client
-```
+<sub>Click the diagram for the interactive version (zoom, dark mode, trace a path).</sub>
 
 Walkthrough:
 

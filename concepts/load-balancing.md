@@ -12,15 +12,15 @@ This matters because a single server has a ceiling — CPU, memory, network — 
 
 ## How it works (step by step, with at least 2 Mermaid diagrams)
 
-```mermaid
-flowchart TD
-  Client1["Client A"] --> LB["Load balancer"]
-  Client2["Client B"] --> LB
-  Client3["Client C"] --> LB
-  LB -->|"least loaded"| S1["Server 1<br/>(2 active requests)"]
-  LB -.-> S2["Server 2<br/>(9 active requests)"]
-  LB -.-> S3["Server 3<br/>(5 active requests)"]
-```
+<a href="https://alwintwk.github.io/big-tech-system-design/diagrams/concepts-load-balancing-flow.html">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../diagrams/concepts-load-balancing-flow.dark.png">
+    <img alt="Steps: 1 clients send requests, 2 load balancer receives them, 3 skips unhealthy servers, 4 picks the least loaded, 5 that server handles it" src="../diagrams/concepts-load-balancing-flow.light.png">
+  </picture>
+</a>
+
+
+<sub>Click the diagram for the interactive version (zoom, dark mode, trace a path).</sub>
 
 > **Why this matters:** clients never talk to Server 1, 2, or 3 directly — they only ever know about the load balancer's single address. That indirection is what lets servers be added, removed, or replaced behind the scenes without any client ever needing to change anything.
 

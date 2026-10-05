@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "WhatsApp: sending an end-to-end encrypted message",
+    "output": "diagrams/companies-whatsapp-send-message.html",
+    "viewBox": [
+      1080,
+      498
+    ],
+    "column_fit": "spread",
+    "quality_profile": "showcase",
+    "legend": {
+      "entries": {
+        "default": {
+          "label": "Lookup"
+        },
+        "emphasis": {
+          "label": "Encrypted send"
+        },
+        "return": {
+          "label": "Ack or reply"
+        }
+      }
+    }
+  },
+  "participants": [
+    {
+      "id": "sa",
+      "type": "external",
+      "label": "Sender device",
+      "sublabel": "encrypts"
+    },
+    {
+      "id": "srv",
+      "type": "backend",
+      "label": "WhatsApp server",
+      "sublabel": "blind to content"
+    },
+    {
+      "id": "ks",
+      "type": "database",
+      "label": "Key server",
+      "sublabel": "prekeys"
+    },
+    {
+      "id": "r1",
+      "type": "frontend",
+      "label": "Recipient phone",
+      "sublabel": "device 1"
+    },
+    {
+      "id": "r2",
+      "type": "frontend",
+      "label": "Linked desktop",
+      "sublabel": "device 2"
+    }
+  ],
+  "messages": [
+    {
+      "id": "m1",
+      "from": "sa",
+      "to": "srv",
+      "y": 170,
+      "label": "1. Ask for recipient device list",
+      "variant": "default"
+    },
+    {
+      "id": "m2",
+      "from": "srv",
+      "to": "ks",
+      "y": 198,
+      "label": "2. Fetch device list + prekeys",
+      "variant": "default"
+    },
+    {
+      "id": "m3",
+      "from": "ks",
+      "to": "srv",
+      "y": 226,
+      "label": "3. Devices + public keys",
+      "variant": "return"
+    },
+    {
+      "id": "m4",
+      "from": "srv",
+      "to": "sa",
+      "y": 254,
+      "label": "4. Device list + prekey bundles",
+      "variant": "return"
+    },
+    {
+      "id": "m5",
+      "from": "sa",
+      "to": "srv",
+      "y": 282,
+      "label": "5. Send one ciphertext per device",
+      "variant": "emphasis"
+    },
+    {
+      "id": "m6",
+      "from": "srv",
+      "to": "r1",
+      "y": 310,
+      "label": "6. Deliver ciphertext",
+      "variant": "emphasis"
+    },
+    {
+      "id": "m7",
+      "from": "srv",
+      "to": "r2",
+      "y": 338,
+      "label": "7. Deliver ciphertext",
+      "variant": "emphasis"
+    },
+    {
+      "id": "m8",
+      "from": "r1",
+      "to": "srv",
+      "y": 366,
+      "label": "8. Delivery ack",
+      "variant": "return"
+    },
+    {
+      "id": "m9",
+      "from": "srv",
+      "to": "sa",
+      "y": 394,
+      "label": "9. Relay acks (double tick)",
+      "variant": "return"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Client fan-out",
+      "items": [
+        "Sender encrypts once per recipient device",
+        "Server only moves ciphertext"
+      ]
+    }
+  ]
+}

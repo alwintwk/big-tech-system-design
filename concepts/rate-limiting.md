@@ -14,14 +14,15 @@ This is exactly the position Stripe is in: hundreds of thousands of businesses s
 
 The most common mechanism is a **token bucket**: each account gets a bucket that refills at a steady rate, and every request costs one token.
 
-```mermaid
-flowchart TD
-  Bucket["Token bucket for Account X<br/>(refills at N tokens/sec, max capacity C)"]
-  Req["Incoming request"] --> Check{"Token available?"}
-  Check -->|"yes: take one token"| Allow["Request proceeds"]
-  Check -->|"no: bucket empty"| Reject["Reject (429 Too Many Requests)"]
-  Bucket -.->|"refills over time"| Check
-```
+<a href="https://alwintwk.github.io/big-tech-system-design/diagrams/concepts-rate-limiting-token-bucket.html">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../diagrams/concepts-rate-limiting-token-bucket.dark.png">
+    <img alt="Steps: 1 request arrives, 2 check for a token, 3 take one token, 4 request proceeds; empty bucket rejects with 429; bucket refills over time" src="../diagrams/concepts-rate-limiting-token-bucket.light.png">
+  </picture>
+</a>
+
+
+<sub>Click the diagram for the interactive version (zoom, dark mode, trace a path).</sub>
 
 > **Why this matters:** the bucket's *capacity* (how many tokens it can hold at once) and its *refill rate* (how fast tokens replenish) are two separate knobs. Capacity controls how big a burst is allowed; refill rate controls the sustained average — tuning only one of them misses half the picture.
 

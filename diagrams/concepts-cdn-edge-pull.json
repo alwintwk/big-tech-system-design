@@ -1,0 +1,125 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "CDN edge: serve nearby, fetch from origin once",
+    "quality_profile": "showcase",
+    "output": "diagrams/concepts-cdn-edge-pull.html",
+    "legend": {
+      "entries": {
+        "external": {
+          "label": "User"
+        },
+        "messagebus": {
+          "label": "CDN edge"
+        },
+        "database": {
+          "label": "Origin"
+        },
+        "backend": {
+          "label": "Edge stores copy"
+        }
+      }
+    }
+  },
+  "lanes": [
+    {
+      "id": "ask",
+      "label": "Near the user"
+    },
+    {
+      "id": "slow",
+      "label": "Far away (miss)"
+    }
+  ],
+  "mainPath": [
+    "u",
+    "e",
+    "o",
+    "k",
+    "s"
+  ],
+  "nodes": [
+    {
+      "id": "u",
+      "lane": "ask",
+      "col": 0,
+      "type": "external",
+      "label": "1. User asks for video",
+      "sublabel": "e.g. user in Tokyo",
+      "width": 185
+    },
+    {
+      "id": "e",
+      "lane": "ask",
+      "col": 1,
+      "type": "messagebus",
+      "label": "2. Nearby edge checks",
+      "sublabel": "its own copy",
+      "width": 185
+    },
+    {
+      "id": "o",
+      "lane": "slow",
+      "col": 2,
+      "type": "database",
+      "label": "3. Miss: fetch from origin",
+      "sublabel": "the source of truth",
+      "width": 185
+    },
+    {
+      "id": "k",
+      "lane": "slow",
+      "col": 3,
+      "type": "backend",
+      "label": "4. Edge keeps a copy",
+      "sublabel": "next user is a hit",
+      "width": 185
+    },
+    {
+      "id": "s",
+      "lane": "ask",
+      "col": 4,
+      "type": "external",
+      "label": "5. Send video to user",
+      "sublabel": "",
+      "width": 185
+    }
+  ],
+  "edges": [
+    {
+      "id": "u-e",
+      "from": "u",
+      "to": "e",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e-s",
+      "from": "e",
+      "to": "s",
+      "label": "hit: edge answers",
+      "role": "branch",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "e-o",
+      "from": "e",
+      "to": "o",
+      "label": "miss: fetch once",
+      "variant": "emphasis"
+    },
+    {
+      "id": "o-k",
+      "from": "o",
+      "to": "k",
+      "variant": "emphasis"
+    },
+    {
+      "id": "k-s",
+      "from": "k",
+      "to": "s",
+      "variant": "emphasis"
+    }
+  ]
+}

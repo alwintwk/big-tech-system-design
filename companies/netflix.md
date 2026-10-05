@@ -321,35 +321,14 @@ This section drills into five things the high-level picture glosses over: the ex
 
 ### Core flow: pressing play
 
-```mermaid
-sequenceDiagram
-  participant U as User device
-  participant GW as Zuul Gateway
-  participant API as PlayAPI
-  participant DRM as License/DRM service
-  participant ST as Steering service
-  participant OCA as Open Connect Appliance
-  participant OCA2 as Backup OCA
+<a href="https://alwintwk.github.io/big-tech-system-design/diagrams/companies-netflix-playback.html">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../diagrams/companies-netflix-playback.dark.png">
+    <img alt="Steps: 1. Request playback for a title; 2. Route to PlayAPI; 3. Request license + manifest; 4. Signed manifest + bitrate ladder; 5. Best OCAs for this client IP?; 6. Ranked OCA list; 7. Manifest + ranked OCA URLs; 8. Request first video/audio segment; 9. Segment at chosen quality; 10. Next segment (device picks quality)" src="../diagrams/companies-netflix-playback.light.png">
+  </picture>
+</a>
 
-  U->>GW: request playback for a title
-  GW->>API: route to Playback Apps API
-  API->>DRM: request license + manifest
-  DRM-->>API: signed manifest with bitrate ladder
-  API->>ST: resolve best OCAs for this client IP
-  ST-->>API: ranked list of candidate OCAs
-  API-->>U: manifest plus ranked OCA URLs
-  U->>OCA: HTTPS request for first video/audio segment
-  alt OCA healthy
-    OCA-->>U: segment (chosen quality level)
-  else OCA unresponsive
-    U->>OCA2: retry with next OCA in ranked list
-    OCA2-->>U: segment
-  end
-  loop adaptive bitrate streaming
-    U->>OCA: request next segment, quality chosen by client ABR logic
-    OCA-->>U: segment
-  end
-```
+<sub>Click the diagram for the interactive version (zoom, dark mode, trace a path).</sub>
 
 Netflix documents PlayAPI explicitly as the service that "handles device initiated manifest and license requests necessary to start playback," and separately has published that it deliberately treats these user-initiated requests as higher priority than optimistic prefetch requests made while a member is just browsing — so under overload it's the actual play-button press that keeps working, not the guess about what a member might watch next [8](#sources).
 

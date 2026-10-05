@@ -175,20 +175,15 @@ parameters, which is treated as a client bug, not a valid retry.
 
 ## 5. High-level design
 
-```mermaid
-flowchart LR
-  Client[Client] --> Gateway[API gateway]
-  Gateway --> Limiter{Rate limiter}
-  Limiter -->|"allowed"| PaySvc[Payment service]
-  Limiter -->|"rejected"| Reject[429]
+<a href="https://alwintwk.github.io/big-tech-system-design/diagrams/problems-payment-system-charge.html">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../diagrams/problems-payment-system-charge.dark.png">
+    <img alt="Steps: 1 rate limiter (or 429), 2 idempotency check, 3 card network or bank, 4 ledger write, 5 publish event, 6 webhook to merchant" src="../diagrams/problems-payment-system-charge.light.png">
+  </picture>
+</a>
 
-  PaySvc --> IdemStore[(Idempotency key store)]
-  PaySvc --> Network[External card network / bank]
-  PaySvc --> Ledger[(Ledger store<br/>double-entry, ACID)]
-  PaySvc --> EventBus[[Event bus]]
-  EventBus --> WebhookSvc[Webhook delivery service]
-  WebhookSvc --> Merchant[Merchant's server]
-```
+
+<sub>Click the diagram for the interactive version (zoom, dark mode, trace a path).</sub>
 
 Walkthrough:
 

@@ -1,0 +1,184 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "File sync: change on one device reaches another",
+    "quality_profile": "showcase",
+    "output": "diagrams/problems-file-sync-upload-pull.html",
+    "legend": {
+      "entries": {
+        "external": {
+          "label": "Local sync engine"
+        },
+        "backend": {
+          "label": "Device step"
+        },
+        "database": {
+          "label": "Server stores"
+        },
+        "messagebus": {
+          "label": "Notification"
+        }
+      }
+    }
+  },
+  "lanes": [
+    {
+      "id": "a",
+      "label": "Device A"
+    },
+    {
+      "id": "s",
+      "label": "Server"
+    },
+    {
+      "id": "b",
+      "label": "Device B"
+    }
+  ],
+  "mainPath": [
+    "a1",
+    "a2",
+    "a3",
+    "a4",
+    "md",
+    "nt",
+    "b5",
+    "b6"
+  ],
+  "nodes": [
+    {
+      "id": "a1",
+      "lane": "a",
+      "col": 0,
+      "type": "external",
+      "label": "1. Hash changed blocks",
+      "sublabel": "done locally",
+      "width": 148
+    },
+    {
+      "id": "a2",
+      "lane": "a",
+      "col": 1,
+      "type": "backend",
+      "label": "2. Ask what is new",
+      "sublabel": "API checks hashes",
+      "width": 148
+    },
+    {
+      "id": "a3",
+      "lane": "a",
+      "col": 2,
+      "type": "backend",
+      "label": "3. Upload new blocks",
+      "sublabel": "only missing ones",
+      "width": 148
+    },
+    {
+      "id": "a4",
+      "lane": "a",
+      "col": 3,
+      "type": "backend",
+      "label": "4. Commit new revision",
+      "sublabel": "list of block hashes",
+      "width": 148
+    },
+    {
+      "id": "bs",
+      "lane": "s",
+      "col": 2,
+      "type": "database",
+      "label": "Block store",
+      "sublabel": "content-addressed",
+      "width": 148
+    },
+    {
+      "id": "md",
+      "lane": "s",
+      "col": 3,
+      "type": "database",
+      "label": "Metadata store",
+      "sublabel": "file revisions",
+      "width": 148
+    },
+    {
+      "id": "nt",
+      "lane": "s",
+      "col": 4,
+      "type": "messagebus",
+      "label": "Change notification",
+      "sublabel": "tells other devices",
+      "width": 148
+    },
+    {
+      "id": "b5",
+      "lane": "b",
+      "col": 4,
+      "type": "external",
+      "label": "5. Pull metadata",
+      "sublabel": "Device B, changed files",
+      "width": 148
+    },
+    {
+      "id": "b6",
+      "lane": "b",
+      "col": 5,
+      "type": "backend",
+      "label": "6. Download blocks",
+      "sublabel": "only ones it lacks",
+      "width": 148
+    }
+  ],
+  "edges": [
+    {
+      "id": "a1-a2",
+      "from": "a1",
+      "to": "a2",
+      "variant": "emphasis"
+    },
+    {
+      "id": "a2-a3",
+      "from": "a2",
+      "to": "a3",
+      "variant": "emphasis"
+    },
+    {
+      "id": "a3-a4",
+      "from": "a3",
+      "to": "a4",
+      "variant": "emphasis"
+    },
+    {
+      "id": "a3-bs",
+      "from": "a3",
+      "to": "bs",
+      "label": "blocks",
+      "role": "branch"
+    },
+    {
+      "id": "a4-md",
+      "from": "a4",
+      "to": "md",
+      "label": "commit",
+      "variant": "emphasis"
+    },
+    {
+      "id": "md-nt",
+      "from": "md",
+      "to": "nt",
+      "variant": "emphasis"
+    },
+    {
+      "id": "nt-b5",
+      "from": "nt",
+      "to": "b5",
+      "variant": "emphasis"
+    },
+    {
+      "id": "b5-b6",
+      "from": "b5",
+      "to": "b6",
+      "variant": "emphasis"
+    }
+  ]
+}

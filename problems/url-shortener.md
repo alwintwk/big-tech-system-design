@@ -185,20 +185,15 @@ erDiagram
 
 ## 5. High-level design
 
-```mermaid
-flowchart LR
-  Client[Client] --> LB[Load balancer]
-  LB --> Write[Write service<br/>create short URL]
-  LB --> Read[Redirect service]
+<a href="https://alwintwk.github.io/big-tech-system-design/diagrams/problems-url-shortener-redirect.html">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../diagrams/problems-url-shortener-redirect.dark.png">
+    <img alt="Steps: 1 click short link, 2 redirect service, 3 cache lookup; hit redirects, miss 4 reads URL database, 5 send to long URL; click events go to a queue for analytics" src="../diagrams/problems-url-shortener-redirect.light.png">
+  </picture>
+</a>
 
-  Write --> IDGen[ID generator<br/>range allocator]
-  Write --> DB[(URL database<br/>sharded by short_code)]
 
-  Read --> Cache[(Cache<br/>short_code to long_url)]
-  Cache -->|"cache miss"| DB
-  Read --> Queue[[Click event queue]]
-  Queue --> Analytics[(Analytics store)]
-```
+<sub>Click the diagram for the interactive version (zoom, dark mode, trace a path).</sub>
 
 Walkthrough:
 

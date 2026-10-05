@@ -353,36 +353,14 @@ Walking through it:
 
 ### 1. Core flow: posting a tweet and fanning it out
 
-```mermaid
-sequenceDiagram
-  participant U as User
-  participant GW as API Gateway
-  participant TP as TweetyPie
-  participant SF as Snowflake ID Service
-  participant MH as Manhattan
-  participant K as Event Bus
-  participant FO as Fanout Service
-  participant SG as Social Graph Service
-  participant R as Redis Timeline Cache
+<a href="https://alwintwk.github.io/big-tech-system-design/diagrams/companies-twitter-x-post-tweet.html">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../diagrams/companies-twitter-x-post-tweet.dark.png">
+    <img alt="Steps: 1. POST /tweet; 2. Create tweet; 3. Request new ID; 4. 64-bit Snowflake ID; 5. Write tweet row; 6. Ack; 7. 200 OK (via gateway); 8. Publish TweetCreated; 9. Consume event; 10. Push ID onto follower timelines" src="../diagrams/companies-twitter-x-post-tweet.light.png">
+  </picture>
+</a>
 
-  U->>GW: POST /tweet
-  GW->>TP: create tweet
-  TP->>SF: request new ID
-  SF-->>TP: 64-bit Snowflake ID
-  TP->>MH: write tweet row (keyed by Snowflake ID)
-  MH-->>TP: ack
-  TP-->>GW: tweet created
-  GW-->>U: 200 OK
-  TP->>K: publish TweetCreated event
-  K->>FO: consume event
-  FO->>SG: get follower list for author
-  SG-->>FO: follower IDs
-  alt author has a normal-sized following (fan-out-on-write)
-    FO->>R: push tweet ID onto each follower's home-timeline list
-  else author has a very large following (fan-out-on-read)
-    FO->>MH: no bulk push - tweet stays in author's own timeline only
-  end
-```
+<sub>Click the diagram for the interactive version (zoom, dark mode, trace a path).</sub>
 
 Step by step:
 

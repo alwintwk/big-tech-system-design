@@ -159,17 +159,15 @@ again, unchanged, from the new revision.
 
 ## 5. High-level design
 
-```mermaid
-flowchart LR
-  DeviceA[Device A: local sync engine] -->|"1. hash changed blocks"| API[Metadata / API service]
-  API -->|"2. which hashes are missing?"| API
-  DeviceA -->|"3. upload only missing blocks"| BlockStore[(Block store<br/>content-addressed)]
-  DeviceA -->|"4. commit new revision"| MetaDB[(Metadata store)]
-  MetaDB --> Notify[[Change notification]]
-  Notify --> DeviceB[Device B: local sync engine]
-  DeviceB -->|"5. pull changed metadata"| MetaDB
-  DeviceB -->|"6. download only blocks it lacks"| BlockStore
-```
+<a href="https://alwintwk.github.io/big-tech-system-design/diagrams/problems-file-sync-upload-pull.html">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../diagrams/problems-file-sync-upload-pull.dark.png">
+    <img alt="Steps: 1 device A hashes changed blocks, 2 asks what is new, 3 uploads new blocks, 4 commits revision to metadata store; change notification, 5 device B pulls metadata, 6 downloads missing blocks" src="../diagrams/problems-file-sync-upload-pull.light.png">
+  </picture>
+</a>
+
+
+<sub>Click the diagram for the interactive version (zoom, dark mode, trace a path).</sub>
 
 Walkthrough:
 

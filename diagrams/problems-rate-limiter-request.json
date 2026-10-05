@@ -1,0 +1,149 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Rate limiter: allow or reject a request",
+    "quality_profile": "showcase",
+    "output": "diagrams/problems-rate-limiter-request.html",
+    "legend": {
+      "entries": {
+        "external": {
+          "label": "Client"
+        },
+        "backend": {
+          "label": "Services"
+        },
+        "security": {
+          "label": "Limit check"
+        },
+        "database": {
+          "label": "Stores"
+        }
+      }
+    }
+  },
+  "lanes": [
+    {
+      "id": "a",
+      "label": "Request path"
+    },
+    {
+      "id": "b",
+      "label": "Limiter side"
+    }
+  ],
+  "mainPath": [
+    "c",
+    "g",
+    "l",
+    "s",
+    "d"
+  ],
+  "nodes": [
+    {
+      "id": "c",
+      "lane": "a",
+      "col": 0,
+      "type": "external",
+      "label": "1. Client request",
+      "sublabel": "",
+      "width": 175
+    },
+    {
+      "id": "g",
+      "lane": "a",
+      "col": 1,
+      "type": "backend",
+      "label": "2. API gateway",
+      "sublabel": "every request passes here",
+      "width": 175
+    },
+    {
+      "id": "l",
+      "lane": "a",
+      "col": 2,
+      "type": "security",
+      "label": "3. Rate limiter",
+      "sublabel": "allowed?",
+      "width": 175
+    },
+    {
+      "id": "s",
+      "lane": "a",
+      "col": 3,
+      "type": "backend",
+      "label": "4. Backend service",
+      "sublabel": "only if allowed",
+      "width": 175
+    },
+    {
+      "id": "d",
+      "lane": "a",
+      "col": 4,
+      "type": "database",
+      "label": "5. Business data",
+      "sublabel": "",
+      "width": 175
+    },
+    {
+      "id": "st",
+      "lane": "b",
+      "col": 2,
+      "type": "database",
+      "label": "Shared counter store",
+      "sublabel": "e.g. Redis, sharded",
+      "width": 175
+    },
+    {
+      "id": "rj",
+      "lane": "b",
+      "col": 3,
+      "type": "security",
+      "label": "429 response",
+      "sublabel": "rejected",
+      "width": 175
+    }
+  ],
+  "edges": [
+    {
+      "id": "c-g",
+      "from": "c",
+      "to": "g",
+      "variant": "emphasis"
+    },
+    {
+      "id": "g-l",
+      "from": "g",
+      "to": "l",
+      "variant": "emphasis"
+    },
+    {
+      "id": "l-s",
+      "from": "l",
+      "to": "s",
+      "label": "allowed",
+      "variant": "emphasis"
+    },
+    {
+      "id": "s-d",
+      "from": "s",
+      "to": "d",
+      "variant": "emphasis"
+    },
+    {
+      "id": "l-st",
+      "from": "l",
+      "to": "st",
+      "label": "read + update count",
+      "role": "branch"
+    },
+    {
+      "id": "l-rj",
+      "from": "l",
+      "to": "rj",
+      "label": "rejected",
+      "variant": "security",
+      "role": "error"
+    }
+  ]
+}

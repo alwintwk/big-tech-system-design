@@ -396,35 +396,14 @@ Walking through a typical request:
 > blog post [4](#sources). Treat the "locking" and "recovery point" mechanics as a reasonable
 > reference design, not a confirmed description of Stripe's production code.
 
-```mermaid
-sequenceDiagram
-    participant C as Client
-    participant GW as API gateway
-    participant IK as Idempotency key store
-    participant P as Payments service
-    participant N as Card network
-    participant L as Ledger
+<a href="https://alwintwk.github.io/big-tech-system-design/diagrams/companies-stripe-payment.html">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../diagrams/companies-stripe-payment.dark.png">
+    <img alt="Steps: 1. POST /v1/payment_intents (key K); 2. Look up key K; 3. Unseen: row inserted + locked; 4. Process PaymentIntent; 5. Authorize card; 6. Approved; 7. Write balanced entry; 8. Committed; 9. Save result, unlock key; 10. 200 succeeded (via gateway)" src="../diagrams/companies-stripe-payment.light.png">
+  </picture>
+</a>
 
-    C->>GW: POST /v1/payment_intents (Idempotency-Key: K)
-    GW->>IK: look up key K for this account
-    alt key K already completed
-        IK-->>GW: cached status code + body
-        GW-->>C: same response (Idempotent-Replayed: true)
-    else key K in progress (concurrent retry)
-        IK-->>GW: locked
-        GW-->>C: 409 - retry shortly
-    else key K unseen
-        IK->>IK: insert row, lock it, recovery_point = started
-        GW->>P: process PaymentIntent
-        P->>N: authorize card (network has its own idempotency key)
-        N-->>P: approved
-        P->>L: write balanced double-entry transaction
-        L-->>P: transaction committed
-        P->>IK: save response + result, unlock key
-        P-->>GW: 200 PaymentIntent(status=succeeded)
-        GW-->>C: 200 PaymentIntent(status=succeeded)
-    end
-```
+<sub>Click the diagram for the interactive version (zoom, dark mode, trace a path).</sub>
 
 Step by step: the client always sends the same key when it retries the same logical operation. The
 gateway's first stop is the key store, not the payments service — this is deliberate, since it lets

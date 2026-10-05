@@ -12,14 +12,15 @@ This is precisely the wall Discord hit with a guild of tens of thousands of conc
 
 ## How it works (step by step, with at least 2 Mermaid diagrams)
 
-```mermaid
-flowchart TD
-  Event["New message posted in a large guild"] -->|"naive: one send per member"| Bad["1,000,000 individual sends<br/>from a single process<br/>(900ms-2.1s, and getting worse)"]
-  Event -->|"hierarchical fan-out"| Relay["Group recipients by which of a small number<br/>of nodes they're connected to; send ONE message per node"]
-  Relay --> R1["Relay worker on node 1<br/>fans out locally to its own sessions"]
-  Relay --> R2["Relay worker on node 2<br/>fans out locally to its own sessions"]
-  Relay --> R3["Relay worker on node 3<br/>fans out locally to its own sessions"]
-```
+<a href="https://alwintwk.github.io/big-tech-system-design/diagrams/concepts-fan-out-hierarchical.html">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../diagrams/concepts-fan-out-hierarchical.dark.png">
+    <img alt="Hierarchical fan-out steps: 1 message posted, 2 group recipients by node, 3 send one message per node, 4 relay fans out locally, 5 members receive it; naive way is one send per member" src="../diagrams/concepts-fan-out-hierarchical.light.png">
+  </picture>
+</a>
+
+
+<sub>Click the diagram for the interactive version (zoom, dark mode, trace a path).</sub>
 
 > **Why this matters:** the originating process's own workload doesn't grow with the number of recipients at all — it always does roughly the same small amount of work ("send to a small, fixed number of relay nodes"), whether the guild has 300 members or 300,000. All the work that *does* scale with recipient count happens in parallel, spread across many relay workers instead of piling onto one.
 

@@ -37,23 +37,15 @@ Step by step:
 4. Anything that used to be "just a SQL join across two tables" now has to become an API call (or an asynchronously-updated cache) between two services — slower per-operation, but each service can now be built, tested, and deployed on its own schedule.
 5. A client calling into this new world of many services typically goes through a single gateway/API-facade, rather than needing to know the internal service topology directly.
 
-```mermaid
-sequenceDiagram
-  participant Client
-  participant Booking as Booking Service
-  participant Listing as Listing Service
-  participant Bus as Event bus (async)
+<a href="https://alwintwk.github.io/big-tech-system-design/diagrams/concepts-microservices-api-call.html">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../diagrams/concepts-microservices-api-call.dark.png">
+    <img alt="Sequence: 1 client asks Booking Service, 2 Booking calls Listing Service API, 3 listing data returned, 4 combined response; in the background 5 Listing publishes a change event, 6 event bus updates Booking" src="../diagrams/concepts-microservices-api-call.light.png">
+  </picture>
+</a>
 
-  Client->>Booking: "show my booking with listing details"
-  Booking->>Listing: API call: get listing #4821
-  Listing-->>Booking: title, photo, price
-  Booking-->>Client: combined response
 
-  Note over Listing,Bus: Meanwhile, unrelated to any live request
-  Listing->>Bus: "listing #4821 changed" event
-  Bus-->>Booking: propagate change asynchronously
-  Note over Booking: Booking's own cached copy updates<br/>without Listing ever calling Booking directly
-```
+<sub>Click the diagram for the interactive version (zoom, dark mode, trace a path).</sub>
 
 > **Why this matters:** notice what each service is *not* doing. Booking never reaches into Listing's database directly, and Listing doesn't need to know Booking exists to publish a change — it just emits an event, and whoever cares can subscribe. That decoupling is what lets a spike in one domain's load, or a bug in one domain's deploy, stay contained to that domain instead of spreading everywhere.
 
