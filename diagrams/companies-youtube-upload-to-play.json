@@ -1,0 +1,175 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "YouTube: from upload to playback",
+    "output": "diagrams/companies-youtube-upload-to-play.html",
+    "viewBox": [
+      1080,
+      526
+    ],
+    "column_fit": "spread",
+    "quality_profile": "showcase",
+    "legend": {
+      "entries": {
+        "default": {
+          "label": "Internal step"
+        },
+        "emphasis": {
+          "label": "Upload / watch"
+        },
+        "return": {
+          "label": "Video stream"
+        }
+      }
+    }
+  },
+  "participants": [
+    {
+      "id": "c",
+      "type": "external",
+      "label": "Creator",
+      "sublabel": "uploads"
+    },
+    {
+      "id": "up",
+      "type": "backend",
+      "label": "Upload service",
+      "sublabel": "resumable"
+    },
+    {
+      "id": "raw",
+      "type": "database",
+      "label": "Raw store",
+      "sublabel": "Colossus"
+    },
+    {
+      "id": "q",
+      "type": "messagebus",
+      "label": "Transcode queue",
+      "sublabel": "jobs"
+    },
+    {
+      "id": "f",
+      "type": "backend",
+      "label": "Transcoders",
+      "sublabel": "Argos VCU + FFmpeg"
+    },
+    {
+      "id": "meta",
+      "type": "database",
+      "label": "Metadata",
+      "sublabel": "Vitess MySQL"
+    },
+    {
+      "id": "v",
+      "type": "external",
+      "label": "Viewer",
+      "sublabel": "watches"
+    },
+    {
+      "id": "e",
+      "type": "messagebus",
+      "label": "CDN edge",
+      "sublabel": "GGC"
+    }
+  ],
+  "messages": [
+    {
+      "id": "m1",
+      "from": "c",
+      "to": "up",
+      "y": 170,
+      "label": "1. Upload in chunks",
+      "variant": "emphasis"
+    },
+    {
+      "id": "m2",
+      "from": "up",
+      "to": "raw",
+      "y": 198,
+      "label": "2. Write raw video",
+      "variant": "default"
+    },
+    {
+      "id": "m3",
+      "from": "up",
+      "to": "meta",
+      "y": 226,
+      "label": "3. Insert video row (processing)",
+      "variant": "default"
+    },
+    {
+      "id": "m4",
+      "from": "up",
+      "to": "q",
+      "y": 254,
+      "label": "4. Enqueue transcode job",
+      "variant": "default"
+    },
+    {
+      "id": "m5",
+      "from": "q",
+      "to": "f",
+      "y": 282,
+      "label": "5. Fan out per resolution/codec",
+      "variant": "default"
+    },
+    {
+      "id": "m6",
+      "from": "f",
+      "to": "raw",
+      "y": 310,
+      "label": "6. Read raw video",
+      "variant": "default"
+    },
+    {
+      "id": "m7",
+      "from": "f",
+      "to": "meta",
+      "y": 338,
+      "label": "7. Update status (public when ready)",
+      "variant": "default"
+    },
+    {
+      "id": "m8",
+      "from": "v",
+      "to": "e",
+      "y": 366,
+      "label": "8. Request video (DASH manifest)",
+      "variant": "emphasis"
+    },
+    {
+      "id": "m9",
+      "from": "e",
+      "to": "raw",
+      "y": 394,
+      "label": "9. Cache miss: fetch segments from store",
+      "variant": "default"
+    },
+    {
+      "id": "m10",
+      "from": "e",
+      "to": "v",
+      "y": 422,
+      "label": "10. Stream adaptive-bitrate video",
+      "variant": "return"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "orange",
+      "title": "Simplification",
+      "items": [
+        "Fleet also writes renditions + thumbnails to the encoded store; the edge reads those"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Why a queue",
+      "items": [
+        "Upload returns fast; encoding runs in the background"
+      ]
+    }
+  ]
+}

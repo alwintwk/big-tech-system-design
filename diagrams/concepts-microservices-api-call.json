@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "Microservices: one API call, one async update",
+    "output": "diagrams/concepts-microservices-api-call.html",
+    "viewBox": [
+      1000,
+      505
+    ],
+    "column_fit": "spread",
+    "quality_profile": "showcase",
+    "legend": {
+      "entries": {
+        "emphasis": {
+          "label": "Client call"
+        },
+        "default": {
+          "label": "API call"
+        },
+        "return": {
+          "label": "Reply"
+        },
+        "dashed": {
+          "label": "Async event"
+        }
+      }
+    }
+  },
+  "participants": [
+    {
+      "id": "c",
+      "type": "external",
+      "label": "Client",
+      "sublabel": "asks for a booking"
+    },
+    {
+      "id": "b",
+      "type": "backend",
+      "label": "Booking Service",
+      "sublabel": "owns booking data"
+    },
+    {
+      "id": "l",
+      "type": "backend",
+      "label": "Listing Service",
+      "sublabel": "owns listing data"
+    },
+    {
+      "id": "bus",
+      "type": "messagebus",
+      "label": "Event bus",
+      "sublabel": "async, off the request path"
+    }
+  ],
+  "segments": [
+    {
+      "from": 171,
+      "to": 299,
+      "label": "Live request"
+    },
+    {
+      "from": 331,
+      "to": 399,
+      "label": "Meanwhile, in the background"
+    }
+  ],
+  "messages": [
+    {
+      "id": "m1",
+      "from": "c",
+      "to": "b",
+      "y": 195,
+      "label": "1. show my booking + listing details",
+      "variant": "emphasis"
+    },
+    {
+      "id": "m2",
+      "from": "b",
+      "to": "l",
+      "y": 225,
+      "label": "2. API call: get listing #4821",
+      "variant": "default"
+    },
+    {
+      "id": "m3",
+      "from": "l",
+      "to": "b",
+      "y": 255,
+      "label": "3. title, photo, price",
+      "variant": "return"
+    },
+    {
+      "id": "m4",
+      "from": "b",
+      "to": "c",
+      "y": 285,
+      "label": "4. combined response",
+      "variant": "return"
+    },
+    {
+      "id": "m5",
+      "from": "l",
+      "to": "bus",
+      "y": 355,
+      "label": "5. event: listing #4821 changed",
+      "variant": "dashed"
+    },
+    {
+      "id": "m6",
+      "from": "bus",
+      "to": "b",
+      "y": 385,
+      "label": "6. propagate change, async",
+      "variant": "dashed"
+    }
+  ]
+}

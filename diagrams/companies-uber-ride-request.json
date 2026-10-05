@@ -1,0 +1,199 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "Uber: matching a rider to a driver",
+    "output": "diagrams/companies-uber-ride-request.html",
+    "viewBox": [
+      1080,
+      610
+    ],
+    "column_fit": "spread",
+    "quality_profile": "showcase",
+    "legend": {
+      "entries": {
+        "default": {
+          "label": "Internal lookup"
+        },
+        "emphasis": {
+          "label": "Rider / offer"
+        },
+        "return": {
+          "label": "Reply"
+        }
+      }
+    }
+  },
+  "participants": [
+    {
+      "id": "r",
+      "type": "external",
+      "label": "Rider app",
+      "sublabel": "requests trip"
+    },
+    {
+      "id": "d",
+      "type": "backend",
+      "label": "Demand",
+      "sublabel": "new request"
+    },
+    {
+      "id": "p",
+      "type": "backend",
+      "label": "Pricing",
+      "sublabel": "fare + surge"
+    },
+    {
+      "id": "x",
+      "type": "backend",
+      "label": "DISCO",
+      "sublabel": "dispatch optimizer"
+    },
+    {
+      "id": "g",
+      "type": "database",
+      "label": "Geo index",
+      "sublabel": "H3 / S2"
+    },
+    {
+      "id": "e",
+      "type": "backend",
+      "label": "ETA service",
+      "sublabel": "DeepETA"
+    },
+    {
+      "id": "s",
+      "type": "backend",
+      "label": "Supply",
+      "sublabel": "driver side"
+    },
+    {
+      "id": "dr",
+      "type": "external",
+      "label": "Driver app",
+      "sublabel": "gets offer"
+    }
+  ],
+  "messages": [
+    {
+      "id": "m1",
+      "from": "r",
+      "to": "d",
+      "y": 170,
+      "label": "1. Request trip (via edge)",
+      "variant": "emphasis"
+    },
+    {
+      "id": "m2",
+      "from": "d",
+      "to": "p",
+      "y": 198,
+      "label": "2. Fare quote for this area",
+      "variant": "default"
+    },
+    {
+      "id": "m3",
+      "from": "p",
+      "to": "d",
+      "y": 226,
+      "label": "3. Base fare + surge",
+      "variant": "return"
+    },
+    {
+      "id": "m4",
+      "from": "d",
+      "to": "x",
+      "y": 254,
+      "label": "4. Join current batch window",
+      "variant": "default"
+    },
+    {
+      "id": "m5",
+      "from": "x",
+      "to": "g",
+      "y": 282,
+      "label": "5. Drivers near pickup?",
+      "variant": "default"
+    },
+    {
+      "id": "m6",
+      "from": "g",
+      "to": "x",
+      "y": 310,
+      "label": "6. Candidate drivers",
+      "variant": "return"
+    },
+    {
+      "id": "m7",
+      "from": "x",
+      "to": "e",
+      "y": 338,
+      "label": "7. ETA for each candidate",
+      "variant": "default"
+    },
+    {
+      "id": "m8",
+      "from": "e",
+      "to": "x",
+      "y": 366,
+      "label": "8. ETA estimates",
+      "variant": "return"
+    },
+    {
+      "id": "m9",
+      "from": "x",
+      "to": "s",
+      "y": 394,
+      "label": "9. Propose assignment",
+      "variant": "emphasis"
+    },
+    {
+      "id": "m10",
+      "from": "s",
+      "to": "dr",
+      "y": 422,
+      "label": "10. Push trip offer",
+      "variant": "emphasis"
+    },
+    {
+      "id": "m11",
+      "from": "dr",
+      "to": "s",
+      "y": 450,
+      "label": "11. Accept",
+      "variant": "return"
+    },
+    {
+      "id": "m12",
+      "from": "s",
+      "to": "d",
+      "y": 478,
+      "label": "12. Confirm (trip saved by DISCO)",
+      "variant": "return"
+    },
+    {
+      "id": "m13",
+      "from": "d",
+      "to": "r",
+      "y": 506,
+      "label": "13. Driver assigned + ETA",
+      "variant": "return"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "orange",
+      "title": "Reject or timeout",
+      "items": [
+        "The request goes back into the next batch"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Why batches",
+      "items": [
+        "DISCO optimizes all open requests together"
+      ]
+    }
+  ]
+}

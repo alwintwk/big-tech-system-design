@@ -14,14 +14,15 @@ This is exactly Uber's problem, at a scale where it can't be solved by getting a
 
 ## How it works (step by step, with at least 2 Mermaid diagrams)
 
-```mermaid
-flowchart TD
-  GPS["Driver's raw GPS point<br/>(lat, lng)"] --> Cell["Map to a cell ID<br/>(H3 hexagon at some resolution)"]
-  Cell --> Index[("Geo-index:<br/>cell ID -> list of drivers in that cell")]
-  Query["Rider requests a trip<br/>(also has a cell ID)"] --> Lookup["Look up the rider's own cell<br/>plus a ring of neighboring cells"]
-  Lookup --> Index
-  Index --> Candidates["Small candidate list of nearby drivers<br/>(not every driver on Earth)"]
-```
+<a href="https://alwintwk.github.io/big-tech-system-design/diagrams/concepts-geo-indexing-cells.html">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../diagrams/concepts-geo-indexing-cells.dark.png">
+    <img alt="Steps: 1 driver GPS ping, 2 map to a cell ID, saved in the geo-index; 3 rider requests a trip, 4 look up own cell plus ring of neighbors, 5 small candidate list" src="../diagrams/concepts-geo-indexing-cells.light.png">
+  </picture>
+</a>
+
+
+<sub>Click the diagram for the interactive version (zoom, dark mode, trace a path).</sub>
 
 > **Why this matters:** the index never has to know or care about the *shape* of "nearby" — it just answers "who's filed under these specific cell IDs," which is an ordinary, fast lookup regardless of how many total drivers exist worldwide. All the geographic complexity gets pushed into the one-time step of turning a GPS point into a cell ID.
 

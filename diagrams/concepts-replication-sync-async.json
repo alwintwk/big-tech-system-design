@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "Leader-follower writes: sync vs async",
+    "output": "diagrams/concepts-replication-sync-async.html",
+    "viewBox": [
+      1000,
+      595
+    ],
+    "column_fit": "spread",
+    "quality_profile": "showcase",
+    "legend": {
+      "entries": {
+        "emphasis": {
+          "label": "Client write"
+        },
+        "default": {
+          "label": "Replicate"
+        },
+        "return": {
+          "label": "Ack / confirm"
+        },
+        "dashed": {
+          "label": "Background copy"
+        }
+      }
+    }
+  },
+  "participants": [
+    {
+      "id": "c",
+      "type": "external",
+      "label": "Client",
+      "sublabel": "writes data"
+    },
+    {
+      "id": "l",
+      "type": "database",
+      "label": "Leader",
+      "sublabel": "takes the write"
+    },
+    {
+      "id": "f1",
+      "type": "database",
+      "label": "Follower 1",
+      "sublabel": "copy"
+    },
+    {
+      "id": "f2",
+      "type": "database",
+      "label": "Follower 2",
+      "sublabel": "copy"
+    }
+  ],
+  "segments": [
+    {
+      "from": 171,
+      "to": 359,
+      "label": "Synchronous (safer, slower)"
+    },
+    {
+      "from": 391,
+      "to": 489,
+      "label": "Asynchronous (faster, riskier)"
+    }
+  ],
+  "messages": [
+    {
+      "id": "m1",
+      "from": "c",
+      "to": "l",
+      "y": 195,
+      "label": "1. write",
+      "variant": "emphasis"
+    },
+    {
+      "id": "m2",
+      "from": "l",
+      "to": "f1",
+      "y": 225,
+      "label": "2. replicate",
+      "variant": "default"
+    },
+    {
+      "id": "m3",
+      "from": "l",
+      "to": "f2",
+      "y": 255,
+      "label": "3. replicate",
+      "variant": "default"
+    },
+    {
+      "id": "m4",
+      "from": "f1",
+      "to": "l",
+      "y": 285,
+      "label": "4. ack",
+      "variant": "return"
+    },
+    {
+      "id": "m5",
+      "from": "f2",
+      "to": "l",
+      "y": 315,
+      "label": "5. ack",
+      "variant": "return"
+    },
+    {
+      "id": "m6",
+      "from": "l",
+      "to": "c",
+      "y": 345,
+      "label": "6. confirm: only now",
+      "variant": "return"
+    },
+    {
+      "id": "m7",
+      "from": "c",
+      "to": "l",
+      "y": 415,
+      "label": "7. write",
+      "variant": "emphasis"
+    },
+    {
+      "id": "m8",
+      "from": "l",
+      "to": "c",
+      "y": 445,
+      "label": "8. confirm at once",
+      "variant": "return"
+    },
+    {
+      "id": "m9",
+      "from": "l",
+      "to": "f1",
+      "y": 475,
+      "label": "9. replicate later",
+      "variant": "dashed"
+    }
+  ]
+}

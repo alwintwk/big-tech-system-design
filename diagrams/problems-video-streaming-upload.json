@@ -1,0 +1,147 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Video streaming: from upload to playable",
+    "quality_profile": "showcase",
+    "output": "diagrams/problems-video-streaming-upload.html",
+    "legend": {
+      "entries": {
+        "external": {
+          "label": "Uploader"
+        },
+        "backend": {
+          "label": "Services"
+        },
+        "messagebus": {
+          "label": "Job queue"
+        },
+        "database": {
+          "label": "Stores"
+        }
+      }
+    }
+  },
+  "lanes": [
+    {
+      "id": "a",
+      "label": "Upload and encode"
+    },
+    {
+      "id": "b",
+      "label": "Safe copies"
+    }
+  ],
+  "mainPath": [
+    "u",
+    "us",
+    "q",
+    "tf",
+    "es",
+    "mp"
+  ],
+  "nodes": [
+    {
+      "id": "u",
+      "lane": "a",
+      "col": 0,
+      "type": "external",
+      "label": "1. Uploader",
+      "sublabel": "resumable upload",
+      "width": 148
+    },
+    {
+      "id": "us",
+      "lane": "a",
+      "col": 1,
+      "type": "backend",
+      "label": "2. Upload service",
+      "sublabel": "returns once raw is safe",
+      "width": 148
+    },
+    {
+      "id": "q",
+      "lane": "a",
+      "col": 2,
+      "type": "messagebus",
+      "label": "3. Transcode queue",
+      "sublabel": "encoding is async",
+      "width": 148
+    },
+    {
+      "id": "tf",
+      "lane": "a",
+      "col": 3,
+      "type": "backend",
+      "label": "4. Transcoder fleet",
+      "sublabel": "job per rendition",
+      "width": 148
+    },
+    {
+      "id": "es",
+      "lane": "a",
+      "col": 4,
+      "type": "database",
+      "label": "5. Save renditions",
+      "sublabel": "each saved on its own",
+      "width": 148
+    },
+    {
+      "id": "mp",
+      "lane": "a",
+      "col": 5,
+      "type": "database",
+      "label": "6. Mark playable",
+      "sublabel": "metadata updated",
+      "width": 148
+    },
+    {
+      "id": "raw",
+      "lane": "b",
+      "col": 1,
+      "type": "database",
+      "label": "Raw video store",
+      "sublabel": "original never lost",
+      "width": 148
+    }
+  ],
+  "edges": [
+    {
+      "id": "u-us",
+      "from": "u",
+      "to": "us",
+      "variant": "emphasis"
+    },
+    {
+      "id": "us-q",
+      "from": "us",
+      "to": "q",
+      "variant": "emphasis"
+    },
+    {
+      "id": "q-tf",
+      "from": "q",
+      "to": "tf",
+      "variant": "emphasis"
+    },
+    {
+      "id": "tf-es",
+      "from": "tf",
+      "to": "es",
+      "variant": "emphasis"
+    },
+    {
+      "id": "es-mp",
+      "from": "es",
+      "to": "mp",
+      "variant": "emphasis"
+    },
+    {
+      "id": "us-raw",
+      "from": "us",
+      "to": "raw",
+      "label": "raw bytes first",
+      "role": "branch"
+    }
+  ]
+}

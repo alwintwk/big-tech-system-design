@@ -1,0 +1,132 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Hierarchical fan-out for a huge guild",
+    "quality_profile": "showcase",
+    "output": "diagrams/concepts-fan-out-hierarchical.html",
+    "legend": {
+      "entries": {
+        "external": {
+          "label": "Message / members"
+        },
+        "backend": {
+          "label": "Grouping and relay"
+        },
+        "messagebus": {
+          "label": "Per-node send"
+        },
+        "security": {
+          "label": "Naive way"
+        }
+      }
+    }
+  },
+  "lanes": [
+    {
+      "id": "main",
+      "label": "Hierarchical (the fix)"
+    },
+    {
+      "id": "alt",
+      "label": "Naive"
+    }
+  ],
+  "mainPath": [
+    "ev",
+    "grp",
+    "snd",
+    "rel",
+    "usr"
+  ],
+  "nodes": [
+    {
+      "id": "ev",
+      "lane": "main",
+      "col": 0,
+      "type": "external",
+      "label": "1. New message posted",
+      "sublabel": "guild with 1M members",
+      "width": 185
+    },
+    {
+      "id": "grp",
+      "lane": "main",
+      "col": 1,
+      "type": "backend",
+      "label": "2. Group by node",
+      "sublabel": "who is connected where",
+      "width": 185
+    },
+    {
+      "id": "snd",
+      "lane": "main",
+      "col": 2,
+      "type": "messagebus",
+      "label": "3. Send ONE per node",
+      "sublabel": "not one per member",
+      "width": 185
+    },
+    {
+      "id": "rel",
+      "lane": "main",
+      "col": 3,
+      "type": "backend",
+      "label": "4. Relay fans out locally",
+      "sublabel": "to its own sessions",
+      "width": 185
+    },
+    {
+      "id": "usr",
+      "lane": "main",
+      "col": 4,
+      "type": "external",
+      "label": "5. Members receive it",
+      "sublabel": "",
+      "width": 185
+    },
+    {
+      "id": "bad",
+      "lane": "alt",
+      "col": 1,
+      "type": "security",
+      "label": "Naive: 1M sends",
+      "sublabel": "900ms-2.1s, one process",
+      "width": 185
+    }
+  ],
+  "edges": [
+    {
+      "id": "ev-grp",
+      "from": "ev",
+      "to": "grp",
+      "variant": "emphasis"
+    },
+    {
+      "id": "grp-snd",
+      "from": "grp",
+      "to": "snd",
+      "variant": "emphasis"
+    },
+    {
+      "id": "snd-rel",
+      "from": "snd",
+      "to": "rel",
+      "variant": "emphasis"
+    },
+    {
+      "id": "rel-usr",
+      "from": "rel",
+      "to": "usr",
+      "variant": "emphasis"
+    },
+    {
+      "id": "ev-bad",
+      "from": "ev",
+      "to": "bad",
+      "label": "naive",
+      "variant": "security",
+      "role": "error"
+    }
+  ]
+}

@@ -12,13 +12,15 @@ This matters most for large, unchanging files — video, images, audio — which
 
 ## How it works (step by step, with at least 2 Mermaid diagrams)
 
-```mermaid
-flowchart TD
-  User["User in Tokyo"] -->|"request video"| Edge["Nearby CDN edge server"]
-  Edge -->|"cache hit"| User
-  Edge -.->|"cache miss: fetch once"| Origin[("Origin server<br/>(source of truth)")]
-  Origin -.-> Edge
-```
+<a href="https://alwintwk.github.io/big-tech-system-design/diagrams/concepts-cdn-edge-pull.html">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../diagrams/concepts-cdn-edge-pull.dark.png">
+    <img alt="CDN steps: 1 user asks, 2 nearby edge checks its cache; on a hit it answers, on a miss 3 fetch once from origin, 4 edge keeps a copy, 5 send to user" src="../diagrams/concepts-cdn-edge-pull.light.png">
+  </picture>
+</a>
+
+
+<sub>Click the diagram for the interactive version (zoom, dark mode, trace a path).</sub>
 
 > **Why this matters:** every user in Tokyo after the first one benefits from that first user's cache miss — the edge server only ever needs to fetch a given piece of content from the origin once, no matter how many thousands of local requests follow.
 

@@ -1,0 +1,125 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Read-through cache, step by step",
+    "quality_profile": "showcase",
+    "output": "diagrams/concepts-caching-read-through.html",
+    "legend": {
+      "entries": {
+        "external": {
+          "label": "Caller / result"
+        },
+        "security": {
+          "label": "Cache check"
+        },
+        "database": {
+          "label": "Database"
+        },
+        "backend": {
+          "label": "Cache write"
+        }
+      }
+    }
+  },
+  "lanes": [
+    {
+      "id": "ask",
+      "label": "Ask"
+    },
+    {
+      "id": "slow",
+      "label": "Slow path (miss)"
+    }
+  ],
+  "mainPath": [
+    "req",
+    "chk",
+    "db",
+    "st",
+    "ret"
+  ],
+  "nodes": [
+    {
+      "id": "req",
+      "lane": "ask",
+      "col": 0,
+      "type": "external",
+      "label": "1. Read request",
+      "sublabel": "get user 42",
+      "width": 185
+    },
+    {
+      "id": "chk",
+      "lane": "ask",
+      "col": 1,
+      "type": "security",
+      "label": "2. In cache?",
+      "sublabel": "look up the key",
+      "width": 185
+    },
+    {
+      "id": "db",
+      "lane": "slow",
+      "col": 2,
+      "type": "database",
+      "label": "3. Miss: read database",
+      "sublabel": "only on a miss",
+      "width": 185
+    },
+    {
+      "id": "st",
+      "lane": "slow",
+      "col": 3,
+      "type": "backend",
+      "label": "4. Save into cache",
+      "sublabel": "so next read is a hit",
+      "width": 185
+    },
+    {
+      "id": "ret",
+      "lane": "ask",
+      "col": 4,
+      "type": "external",
+      "label": "5. Return value",
+      "sublabel": "to the caller",
+      "width": 185
+    }
+  ],
+  "edges": [
+    {
+      "id": "req-chk",
+      "from": "req",
+      "to": "chk",
+      "variant": "emphasis"
+    },
+    {
+      "id": "chk-ret",
+      "from": "chk",
+      "to": "ret",
+      "label": "hit: fast, no DB",
+      "role": "branch",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "chk-db",
+      "from": "chk",
+      "to": "db",
+      "label": "miss",
+      "variant": "emphasis"
+    },
+    {
+      "id": "db-st",
+      "from": "db",
+      "to": "st",
+      "variant": "emphasis"
+    },
+    {
+      "id": "st-ret",
+      "from": "st",
+      "to": "ret",
+      "variant": "emphasis"
+    }
+  ]
+}

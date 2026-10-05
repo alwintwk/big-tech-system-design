@@ -12,14 +12,15 @@ This exact problem shows up constantly in these systems: a user action (a play, 
 
 ## How it works (step by step, with at least 2 Mermaid diagrams)
 
-```mermaid
-flowchart LR
-  Producer["Producer<br/>(e.g. web request handler)"] -->|"publish"| Queue[["Message queue"]]
-  Queue -->|"consume"| Worker1["Consumer worker 1"]
-  Queue -->|"consume"| Worker2["Consumer worker 2"]
-  Worker1 --> Done1["Message removed once processed"]
-  Worker2 --> Done2["Message removed once processed"]
-```
+<a href="https://alwintwk.github.io/big-tech-system-design/diagrams/concepts-message-queue-flow.html">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../diagrams/concepts-message-queue-flow.dark.png">
+    <img alt="Steps: 1 producer publishes, 2 message waits in queue, 3 worker pulls it, 4 worker processes it, 5 message removed; repeated failures go to a dead-letter queue" src="../diagrams/concepts-message-queue-flow.light.png">
+  </picture>
+</a>
+
+
+<sub>Click the diagram for the interactive version (zoom, dark mode, trace a path).</sub>
 
 > **Why this matters:** the producer's job ends the moment the message is safely queued — it never learns or cares which worker eventually handles it, or how long that takes. That decoupling is what lets the producer stay fast even when downstream processing is temporarily slow.
 

@@ -343,32 +343,14 @@ Walk-through:
 
 ### 1. Core flow: playing a track
 
-```mermaid
-sequenceDiagram
-  participant U as User
-  participant App as Client app
-  participant BE as Backend services
-  participant CDN as Fastly CDN
-  participant Store as Object storage
-  participant Evt as Event receiver
-  participant Bus as Cloud Pub/Sub
+<a href="https://alwintwk.github.io/big-tech-system-design/diagrams/companies-spotify-play.html">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../diagrams/companies-spotify-play.dark.png">
+    <img alt="Steps: 1. Tap play on a track; 2. Playback auth + track metadata; 3. Stream URL, bitrates, license; 4. GET audio chunk (range request); 5. Cache miss: fetch from origin; 6. Chunk; 7. Chunk, now cached at the edge; 8. Send track_play event; 9. Publish to topic" src="../diagrams/companies-spotify-play.light.png">
+  </picture>
+</a>
 
-  U->>App: Tap play on a track
-  App->>BE: Request playback authorization + track metadata
-  BE-->>App: Stream URL, bitrate options, DRM/license token
-  App->>CDN: GET audio chunk (range request)
-  alt cache hit
-    CDN-->>App: Audio chunk served from edge
-  else cache miss
-    CDN->>Store: Fetch chunk from origin
-    Store-->>CDN: Chunk
-    CDN-->>App: Audio chunk (now cached)
-  end
-  App->>App: Decode + buffer + play
-  App->>Evt: Emit "track_play" event (async, non-blocking)
-  Evt->>Bus: Publish event to topic
-  Note over Bus: Downstream Dataflow jobs dedupe,<br/>write to GCS/BigQuery/Bigtable
-```
+<sub>Click the diagram for the interactive version (zoom, dark mode, trace a path).</sub>
 
 The key design choice here is that the event emission in the last two steps is asynchronous and off the playback critical path: if the event receiver or Pub/Sub is degraded, audio still plays — only analytics and future recommendations are delayed. This mirrors a lesson visible in Spotify's own incident reports: the 2022 and 2025 outages both took down authentication/playback precisely because a *shared* dependency (service discovery, a proxy layer) sat in the critical path for everything at once [15][17].
 

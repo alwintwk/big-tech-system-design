@@ -1,0 +1,181 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Chat app: sending one message",
+    "quality_profile": "showcase",
+    "output": "diagrams/problems-chat-app-send-message.html",
+    "legend": {
+      "entries": {
+        "external": {
+          "label": "Devices"
+        },
+        "backend": {
+          "label": "Chat servers"
+        },
+        "messagebus": {
+          "label": "Queue"
+        },
+        "database": {
+          "label": "Stores"
+        }
+      }
+    }
+  },
+  "lanes": [
+    {
+      "id": "a",
+      "label": "Accept and deliver"
+    },
+    {
+      "id": "b",
+      "label": "Lookups and storage"
+    }
+  ],
+  "mainPath": [
+    "dev",
+    "gw1",
+    "mq",
+    "rt",
+    "gw2",
+    "rcv"
+  ],
+  "nodes": [
+    {
+      "id": "dev",
+      "lane": "a",
+      "col": 0,
+      "type": "external",
+      "label": "1. Sender device",
+      "sublabel": "sends the message",
+      "width": 148
+    },
+    {
+      "id": "gw1",
+      "lane": "a",
+      "col": 1,
+      "type": "backend",
+      "label": "2. Gateway 1",
+      "sublabel": "queues the message",
+      "width": 148
+    },
+    {
+      "id": "mq",
+      "lane": "a",
+      "col": 2,
+      "type": "messagebus",
+      "label": "3. Message queue",
+      "sublabel": "accept apart from deliver",
+      "width": 148
+    },
+    {
+      "id": "rt",
+      "lane": "a",
+      "col": 3,
+      "type": "backend",
+      "label": "4. Fan-out router",
+      "sublabel": "finds their gateway",
+      "width": 148
+    },
+    {
+      "id": "gw2",
+      "lane": "a",
+      "col": 4,
+      "type": "backend",
+      "label": "5. Gateway 2",
+      "sublabel": "holds recipient link",
+      "width": 148
+    },
+    {
+      "id": "rcv",
+      "lane": "a",
+      "col": 5,
+      "type": "external",
+      "label": "6. Recipient device",
+      "sublabel": "gets the message",
+      "width": 148
+    },
+    {
+      "id": "st",
+      "lane": "b",
+      "col": 2,
+      "type": "database",
+      "label": "Message store",
+      "sublabel": "by conversation_id",
+      "width": 148
+    },
+    {
+      "id": "pr",
+      "lane": "b",
+      "col": 3,
+      "type": "database",
+      "label": "Presence registry",
+      "sublabel": "user_id -> gateway",
+      "width": 148
+    },
+    {
+      "id": "off",
+      "lane": "b",
+      "col": 4,
+      "type": "messagebus",
+      "label": "Offline queue",
+      "sublabel": "held till reconnect",
+      "width": 148
+    }
+  ],
+  "edges": [
+    {
+      "id": "dev-gw1",
+      "from": "dev",
+      "to": "gw1",
+      "variant": "emphasis"
+    },
+    {
+      "id": "gw1-mq",
+      "from": "gw1",
+      "to": "mq",
+      "variant": "emphasis"
+    },
+    {
+      "id": "mq-rt",
+      "from": "mq",
+      "to": "rt",
+      "variant": "emphasis"
+    },
+    {
+      "id": "rt-gw2",
+      "from": "rt",
+      "to": "gw2",
+      "label": "recipient online",
+      "variant": "emphasis"
+    },
+    {
+      "id": "gw2-rcv",
+      "from": "gw2",
+      "to": "rcv",
+      "variant": "emphasis"
+    },
+    {
+      "id": "mq-st",
+      "from": "mq",
+      "to": "st",
+      "label": "saved",
+      "role": "branch"
+    },
+    {
+      "id": "rt-pr",
+      "from": "rt",
+      "to": "pr",
+      "label": "who is where?",
+      "role": "branch"
+    },
+    {
+      "id": "rt-off",
+      "from": "rt",
+      "to": "off",
+      "label": "offline",
+      "variant": "dashed",
+      "role": "async"
+    }
+  ]
+}

@@ -399,25 +399,14 @@ Walking through it:
 
 ### 1. Core flow: posting a message and fanning it out
 
-```mermaid
-sequenceDiagram
-  participant C as Sender client
-  participant WA as Webapp
-  participant AS as Admin Server
-  participant CS as Channel Server
-  participant JQ as Job queue
-  participant GS as Gateway Server
-  participant R as Recipient client
+<a href="https://alwintwk.github.io/big-tech-system-design/diagrams/companies-slack-send-message.html">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../diagrams/companies-slack-send-message.dark.png">
+    <img alt="Steps: 1. POST message; 2. Forward message; 3. Write to channel (hash routed); 4. Acknowledged; 5. Enqueue async jobs (search, notify); 6. Push to subscribed Gateways; 7. Message event over WebSocket" src="../diagrams/companies-slack-send-message.light.png">
+  </picture>
+</a>
 
-  C->>WA: POST message, HTTPS
-  WA->>AS: Forward message
-  AS->>CS: Write to channel, consistent-hash routed
-  CS-->>AS: Acknowledged
-  WA->>JQ: Enqueue async jobs, search index, notifications
-  CS->>GS: Push to every subscribed Gateway Server
-  GS-->>R: WebSocket message event
-  JQ->>R: Push notification, if client is offline
-```
+<sub>Click the diagram for the interactive version (zoom, dark mode, trace a path).</sub>
 
 The step worth dwelling on is `CS->>GS`: the Channel Server doesn't try to reach individual client sockets directly — it only knows about Gateway Servers, and each Gateway Server only knows about its own connected clients.
 

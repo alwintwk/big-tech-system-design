@@ -12,14 +12,15 @@ Almost every distributed system in this repo has some piece that had to make exa
 
 ## How it works (step by step, with at least 2 Mermaid diagrams)
 
-```mermaid
-flowchart TD
-  Partition["Network partition:<br/>two halves of the system can't talk"] --> Choice{"A client asks<br/>a node cut off from the rest"}
-  Choice -->|"Choose Consistency (CP)"| Refuse["Refuse to answer,<br/>or block until reachable again"]
-  Choice -->|"Choose Availability (AP)"| Answer["Answer immediately<br/>using local (possibly stale) data"]
-  Refuse --> Note1["Never wrong, sometimes unavailable"]
-  Answer --> Note2["Always available, sometimes stale"]
-```
+<a href="https://alwintwk.github.io/big-tech-system-design/diagrams/concepts-cap-partition-choice.html">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../diagrams/concepts-cap-partition-choice.dark.png">
+    <img alt="Steps: 1 network splits, 2 client asks a cut-off node, 3 node must choose; CP refuses or waits, AP answers from local possibly stale data" src="../diagrams/concepts-cap-partition-choice.light.png">
+  </picture>
+</a>
+
+
+<sub>Click the diagram for the interactive version (zoom, dark mode, trace a path).</sub>
 
 > **Why this matters:** neither branch is "the right answer" in general — a CP system is right for a bank balance, an AP system is right for a driver's live GPS position. The theorem doesn't tell you which to pick; it tells you that you must.
 

@@ -172,23 +172,15 @@ computed by counting raw view events — the number shown to users doesn't need 
 
 ## 5. High-level design
 
-```mermaid
-flowchart LR
-  Uploader[Uploader] -->|"resumable upload"| UploadSvc[Upload service]
-  UploadSvc --> RawStore[(Raw video store)]
-  UploadSvc --> MetaDB[(Metadata store<br/>sharded)]
-  UploadSvc --> Queue[[Transcode job queue]]
+<a href="https://alwintwk.github.io/big-tech-system-design/diagrams/problems-video-streaming-upload.html">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../diagrams/problems-video-streaming-upload.dark.png">
+    <img alt="Steps: 1 uploader, 2 upload service stores raw video, 3 transcode job queue, 4 transcoder fleet, 5 save renditions, 6 metadata marks video playable" src="../diagrams/problems-video-streaming-upload.light.png">
+  </picture>
+</a>
 
-  Queue --> Farm[Transcoder fleet]
-  Farm --> RawStore
-  Farm --> EncStore[(Encoded rendition store)]
-  Farm --> MetaDB
 
-  Viewer[Viewer] --> Edge[CDN edge]
-  Edge -->|"cache miss"| MetaDB
-  Edge -->|"cache miss"| EncStore
-  Edge -->|"cache hit"| Viewer
-```
+<sub>Click the diagram for the interactive version (zoom, dark mode, trace a path).</sub>
 
 Walkthrough:
 

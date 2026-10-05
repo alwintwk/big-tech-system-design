@@ -1,0 +1,181 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Ride hailing: request to matched driver",
+    "quality_profile": "showcase",
+    "output": "diagrams/problems-ride-hailing-match.html",
+    "legend": {
+      "entries": {
+        "external": {
+          "label": "Apps"
+        },
+        "backend": {
+          "label": "Services"
+        },
+        "database": {
+          "label": "Stores"
+        }
+      }
+    }
+  },
+  "lanes": [
+    {
+      "id": "a",
+      "label": "Ride request"
+    },
+    {
+      "id": "b",
+      "label": "Data"
+    },
+    {
+      "id": "c",
+      "label": "Driver pings"
+    }
+  ],
+  "mainPath": [
+    "rd",
+    "rs",
+    "dp",
+    "as",
+    "pu"
+  ],
+  "nodes": [
+    {
+      "id": "rd",
+      "lane": "a",
+      "col": 0,
+      "type": "external",
+      "label": "1. Rider asks for a ride",
+      "sublabel": "via API gateway",
+      "width": 175
+    },
+    {
+      "id": "rs",
+      "lane": "a",
+      "col": 1,
+      "type": "backend",
+      "label": "2. Ride service",
+      "sublabel": "records the request",
+      "width": 175
+    },
+    {
+      "id": "dp",
+      "lane": "a",
+      "col": 2,
+      "type": "backend",
+      "label": "3. Dispatch",
+      "sublabel": "finds nearby drivers",
+      "width": 175
+    },
+    {
+      "id": "as",
+      "lane": "a",
+      "col": 3,
+      "type": "backend",
+      "label": "4. Driver assigned",
+      "sublabel": "sent back to ride service",
+      "width": 175
+    },
+    {
+      "id": "pu",
+      "lane": "a",
+      "col": 4,
+      "type": "external",
+      "label": "5. Push update",
+      "sublabel": "to rider and driver apps",
+      "width": 175
+    },
+    {
+      "id": "rdb",
+      "lane": "b",
+      "col": 1,
+      "type": "database",
+      "label": "Ride store",
+      "sublabel": "durable ride record",
+      "width": 175
+    },
+    {
+      "id": "geo",
+      "lane": "b",
+      "col": 2,
+      "type": "database",
+      "label": "Geo-index",
+      "sublabel": "in memory, cell-based",
+      "width": 175
+    },
+    {
+      "id": "da",
+      "lane": "c",
+      "col": 1,
+      "type": "external",
+      "label": "Driver app",
+      "sublabel": "location ping ~every 4s",
+      "width": 175
+    },
+    {
+      "id": "li",
+      "lane": "c",
+      "col": 2,
+      "type": "backend",
+      "label": "Location ingest",
+      "sublabel": "overwrites last position",
+      "width": 175
+    }
+  ],
+  "edges": [
+    {
+      "id": "rd-rs",
+      "from": "rd",
+      "to": "rs",
+      "variant": "emphasis"
+    },
+    {
+      "id": "rs-dp",
+      "from": "rs",
+      "to": "dp",
+      "variant": "emphasis"
+    },
+    {
+      "id": "dp-as",
+      "from": "dp",
+      "to": "as",
+      "variant": "emphasis"
+    },
+    {
+      "id": "as-pu",
+      "from": "as",
+      "to": "pu",
+      "variant": "emphasis"
+    },
+    {
+      "id": "rs-rdb",
+      "from": "rs",
+      "to": "rdb",
+      "label": "save",
+      "role": "branch"
+    },
+    {
+      "id": "dp-geo",
+      "from": "dp",
+      "to": "geo",
+      "label": "nearby drivers?",
+      "role": "branch"
+    },
+    {
+      "id": "da-li",
+      "from": "da",
+      "to": "li",
+      "variant": "dashed",
+      "role": "async"
+    },
+    {
+      "id": "li-geo",
+      "from": "li",
+      "to": "geo",
+      "label": "update position",
+      "variant": "dashed",
+      "role": "async"
+    }
+  ]
+}

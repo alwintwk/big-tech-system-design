@@ -376,34 +376,14 @@ Walking through a feed load:
 
 ### 1. Core flow: loading a ranked Feed
 
-```mermaid
-sequenceDiagram
-  participant U as User's app
-  participant LB as Load balancer
-  participant M as Django monolith
-  participant R as Ranking service
-  participant FS as Feature/embedding store
-  participant C as Cassandra (activity/feed)
-  participant P as Postgres shard
-  participant Ca as Cache (Redis/Memcached)
-  participant CDN as CDN
+<a href="https://alwintwk.github.io/big-tech-system-design/diagrams/companies-instagram-feed.html">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../diagrams/companies-instagram-feed.dark.png">
+    <img alt="Steps: 1. GET /feed; 2. Route request; 3. Check cached feed page (miss); 4. Ask for ranked candidates; 5. Fetch activity + embeddings; 6. Candidates, features; 7. Ranked post IDs; 8. Fetch post + user metadata; 9. Cache the feed page; 10. Feed payload + media URLs" src="../diagrams/companies-instagram-feed.light.png">
+  </picture>
+</a>
 
-  U->>LB: GET /feed
-  LB->>M: route request
-  M->>Ca: check cached feed page
-  alt cache miss
-    M->>R: request ranked candidates
-    R->>C: fetch recent activity/candidate posts
-    R->>FS: fetch user + item embeddings
-    R->>R: retrieval -> early-stage ranking -> late-stage ranking
-    R-->>M: ranked post IDs
-    M->>P: fetch post/user metadata by ID
-    M->>Ca: write feed page to cache
-  end
-  M-->>U: feed payload (post metadata + media URLs)
-  U->>CDN: fetch media by URL
-  CDN-->>U: image/video bytes
-```
+<sub>Click the diagram for the interactive version (zoom, dark mode, trace a path).</sub>
 
 1. The app requests a feed page; the monolith first checks the cache tier, since most feed reads are re-reads of recently computed pages [2].
 2. On a miss, the ranking service pulls candidates from Cassandra-backed activity/feed data and scores them through the retrieval -> early-stage -> late-stage ranking funnel described in the [ranking deep dive](#feed-and-explore-ranking-from-one-sort-order-to-1000-models) [6][7].

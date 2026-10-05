@@ -1,0 +1,116 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Sharding: route a write to one shard",
+    "quality_profile": "showcase",
+    "output": "diagrams/concepts-sharding-route-write.html",
+    "legend": {
+      "entries": {
+        "external": {
+          "label": "Write"
+        },
+        "backend": {
+          "label": "Shard function"
+        },
+        "messagebus": {
+          "label": "Router"
+        },
+        "database": {
+          "label": "Shard"
+        }
+      }
+    }
+  },
+  "lanes": [
+    {
+      "id": "main",
+      "label": "Routing"
+    },
+    {
+      "id": "alt",
+      "label": "Not chosen"
+    }
+  ],
+  "mainPath": [
+    "w",
+    "f",
+    "p",
+    "s1"
+  ],
+  "nodes": [
+    {
+      "id": "w",
+      "lane": "main",
+      "col": 0,
+      "type": "external",
+      "label": "1. Write a row",
+      "sublabel": "user_id=482913",
+      "width": 185
+    },
+    {
+      "id": "f",
+      "lane": "main",
+      "col": 1,
+      "type": "backend",
+      "label": "2. Compute shard",
+      "sublabel": "hash(user_id) mod N",
+      "width": 185
+    },
+    {
+      "id": "p",
+      "lane": "main",
+      "col": 2,
+      "type": "messagebus",
+      "label": "3. Route to Shard 1",
+      "sublabel": "the shard function's answer",
+      "width": 185
+    },
+    {
+      "id": "s1",
+      "lane": "main",
+      "col": 3,
+      "type": "database",
+      "label": "4. Row saved on Shard 1",
+      "sublabel": "only this shard is touched",
+      "width": 185
+    },
+    {
+      "id": "o",
+      "lane": "alt",
+      "col": 3,
+      "type": "database",
+      "label": "Shard 0 and Shard 2",
+      "sublabel": "untouched",
+      "width": 185
+    }
+  ],
+  "edges": [
+    {
+      "id": "w-f",
+      "from": "w",
+      "to": "f",
+      "variant": "emphasis"
+    },
+    {
+      "id": "f-p",
+      "from": "f",
+      "to": "p",
+      "variant": "emphasis"
+    },
+    {
+      "id": "p-s1",
+      "from": "p",
+      "to": "s1",
+      "variant": "emphasis"
+    },
+    {
+      "id": "p-o",
+      "from": "p",
+      "to": "o",
+      "label": "not chosen",
+      "variant": "dashed",
+      "role": "async"
+    }
+  ]
+}

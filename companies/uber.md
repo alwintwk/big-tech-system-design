@@ -405,43 +405,14 @@ Walking through it:
 
 ### Core flow: rider requests a trip, gets matched to a driver
 
-```mermaid
-sequenceDiagram
-  participant R as "Rider App"
-  participant Edge as "Edge / Frontline"
-  participant D as "Demand Service"
-  participant X as "DISCO Dispatch"
-  participant G as "Geo Index (H3/S2)"
-  participant E as "ETA Service (DeepETA)"
-  participant P as "Pricing Service"
-  participant S as "Supply Service"
-  participant DR as "Driver App"
-  participant DB as "Schemaless"
+<a href="https://alwintwk.github.io/big-tech-system-design/diagrams/companies-uber-ride-request.html">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../diagrams/companies-uber-ride-request.dark.png">
+    <img alt="Steps: 1. Request trip (via edge); 2. Fare quote for this area; 3. Base fare + surge; 4. Join current batch window; 5. Drivers near pickup?; 6. Candidate drivers; 7. ETA for each candidate; 8. ETA estimates; 9. Propose assignment; 10. Push trip offer; 11. Accept; 12. Confirm (trip saved by DISCO); 13. Driver assigned + ETA" src="../diagrams/companies-uber-ride-request.light.png">
+  </picture>
+</a>
 
-  R->>Edge: Request trip (pickup, dropoff)
-  Edge->>D: New demand event
-  D->>P: Get fare quote for this cell/time
-  P-->>D: Base fare plus surge multiplier
-  D->>X: Enqueue into current batch window
-  X->>G: Find candidate drivers near pickup cell
-  G-->>X: Candidate driver list
-  X->>E: Get ETA for each candidate
-  E-->>X: ETA estimates
-  X->>X: Batch-optimize all open requests plus candidates
-  X->>S: Propose assignment to chosen driver
-  S->>DR: Push trip offer
-  alt Driver accepts
-    DR-->>S: Accept
-    S-->>X: Confirm assignment
-    X->>DB: Write trip record
-    X-->>D: Match confirmed
-    D-->>R: Driver assigned plus ETA
-  else Driver rejects or times out
-    DR-->>S: Reject or timeout
-    S-->>X: Candidate unavailable
-    X->>X: Re-run batch without this driver
-  end
-```
+<sub>Click the diagram for the interactive version (zoom, dark mode, trace a path).</sub>
 
 The key thing this diagram is trying to show: matching isn't a single request/response. DISCO
 collects candidates from the geo index, scores them using ETA, and only then commits an assignment —

@@ -1,0 +1,119 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "What a cut-off node must choose",
+    "quality_profile": "showcase",
+    "output": "diagrams/concepts-cap-partition-choice.html",
+    "legend": {
+      "entries": {
+        "external": {
+          "label": "Failure"
+        },
+        "frontend": {
+          "label": "Client"
+        },
+        "security": {
+          "label": "The choice"
+        },
+        "database": {
+          "label": "CP outcome"
+        },
+        "backend": {
+          "label": "AP outcome"
+        }
+      }
+    }
+  },
+  "lanes": [
+    {
+      "id": "main",
+      "label": "During a partition"
+    },
+    {
+      "id": "alt",
+      "label": "Other choice"
+    }
+  ],
+  "mainPath": [
+    "part",
+    "ask",
+    "ch",
+    "cp"
+  ],
+  "nodes": [
+    {
+      "id": "part",
+      "lane": "main",
+      "col": 0,
+      "type": "external",
+      "label": "1. Network splits",
+      "sublabel": "two halves cannot talk",
+      "width": 205
+    },
+    {
+      "id": "ask",
+      "lane": "main",
+      "col": 1,
+      "type": "frontend",
+      "label": "2. Client asks a cut-off node",
+      "sublabel": "it cannot reach the rest",
+      "width": 205
+    },
+    {
+      "id": "ch",
+      "lane": "main",
+      "col": 2,
+      "type": "security",
+      "label": "3. Node must choose",
+      "sublabel": "consistency or availability",
+      "width": 205
+    },
+    {
+      "id": "cp",
+      "lane": "main",
+      "col": 3,
+      "type": "database",
+      "label": "CP: refuse or wait",
+      "sublabel": "never wrong, sometimes unavailable",
+      "width": 205
+    },
+    {
+      "id": "ap",
+      "lane": "alt",
+      "col": 3,
+      "type": "backend",
+      "label": "AP: answer locally",
+      "sublabel": "always available, maybe stale",
+      "width": 205
+    }
+  ],
+  "edges": [
+    {
+      "id": "part-ask",
+      "from": "part",
+      "to": "ask",
+      "variant": "emphasis"
+    },
+    {
+      "id": "ask-ch",
+      "from": "ask",
+      "to": "ch",
+      "variant": "emphasis"
+    },
+    {
+      "id": "ch-cp",
+      "from": "ch",
+      "to": "cp",
+      "label": "choose Consistency",
+      "variant": "emphasis"
+    },
+    {
+      "id": "ch-ap",
+      "from": "ch",
+      "to": "ap",
+      "label": "choose Availability",
+      "role": "branch"
+    }
+  ]
+}

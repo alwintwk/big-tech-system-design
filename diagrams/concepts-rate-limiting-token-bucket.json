@@ -1,0 +1,138 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Token bucket: one token per request",
+    "quality_profile": "showcase",
+    "output": "diagrams/concepts-rate-limiting-token-bucket.html",
+    "legend": {
+      "entries": {
+        "database": {
+          "label": "Token bucket"
+        },
+        "external": {
+          "label": "Request"
+        },
+        "security": {
+          "label": "Limit check"
+        },
+        "backend": {
+          "label": "Spend token"
+        }
+      }
+    }
+  },
+  "lanes": [
+    {
+      "id": "top",
+      "label": "Refill"
+    },
+    {
+      "id": "main",
+      "label": "Request path"
+    },
+    {
+      "id": "alt",
+      "label": "Rejected"
+    }
+  ],
+  "mainPath": [
+    "r",
+    "c",
+    "t",
+    "ok"
+  ],
+  "nodes": [
+    {
+      "id": "b",
+      "lane": "top",
+      "col": 1,
+      "type": "database",
+      "label": "Token bucket",
+      "sublabel": "refills N tokens/sec, max C",
+      "width": 185
+    },
+    {
+      "id": "r",
+      "lane": "main",
+      "col": 0,
+      "type": "external",
+      "label": "1. Request arrives",
+      "sublabel": "for Account X",
+      "width": 185
+    },
+    {
+      "id": "c",
+      "lane": "main",
+      "col": 1,
+      "type": "security",
+      "label": "2. Token available?",
+      "sublabel": "check the bucket",
+      "width": 185
+    },
+    {
+      "id": "t",
+      "lane": "main",
+      "col": 2,
+      "type": "backend",
+      "label": "3. Take one token",
+      "sublabel": "",
+      "width": 185
+    },
+    {
+      "id": "ok",
+      "lane": "main",
+      "col": 3,
+      "type": "external",
+      "label": "4. Request proceeds",
+      "sublabel": "",
+      "width": 185
+    },
+    {
+      "id": "no",
+      "lane": "alt",
+      "col": 2,
+      "type": "security",
+      "label": "Reject: 429",
+      "sublabel": "Too Many Requests",
+      "width": 185
+    }
+  ],
+  "edges": [
+    {
+      "id": "r-c",
+      "from": "r",
+      "to": "c",
+      "variant": "emphasis"
+    },
+    {
+      "id": "c-t",
+      "from": "c",
+      "to": "t",
+      "label": "yes",
+      "variant": "emphasis"
+    },
+    {
+      "id": "t-ok",
+      "from": "t",
+      "to": "ok",
+      "variant": "emphasis"
+    },
+    {
+      "id": "b-c",
+      "from": "b",
+      "to": "c",
+      "label": "refills over time",
+      "variant": "dashed",
+      "role": "async"
+    },
+    {
+      "id": "c-no",
+      "from": "c",
+      "to": "no",
+      "label": "no: bucket empty",
+      "variant": "security",
+      "role": "error"
+    }
+  ]
+}

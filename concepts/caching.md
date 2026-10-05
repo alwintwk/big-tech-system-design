@@ -14,14 +14,15 @@ Every big system in this repo hits this same wall: the "source of truth" databas
 
 The most common pattern is **cache-aside** (also called lazy loading): the application, not the database, is responsible for keeping the cache filled.
 
-```mermaid
-flowchart TD
-  Req["Read request: get user 42"] --> Check{"In cache?"}
-  Check -- "hit" --> Return["Return cached value<br/>(fast, no DB hit)"]
-  Check -- "miss" --> DB[("Database")]
-  DB --> Store["Write result into cache"]
-  Store --> Return2["Return value to caller"]
-```
+<a href="https://alwintwk.github.io/big-tech-system-design/diagrams/concepts-caching-read-through.html">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../diagrams/concepts-caching-read-through.dark.png">
+    <img alt="Read-through cache steps: 1 read request, 2 check the cache, on a hit return the cached value, on a miss 3 read the database, 4 save into the cache, 5 return the value" src="../diagrams/concepts-caching-read-through.light.png">
+  </picture>
+</a>
+
+
+<sub>Click the diagram for the interactive version (zoom, dark mode, trace a path).</sub>
 
 > **Why this matters:** the application only ever pays the "walk to the basement" cost once per key, not once per request for that key. Every subsequent request for user 42 is a cache hit, until something invalidates or expires it.
 

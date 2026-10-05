@@ -1,0 +1,135 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Load balancer: pick a healthy, lightly-loaded server",
+    "quality_profile": "showcase",
+    "output": "diagrams/concepts-load-balancing-flow.html",
+    "legend": {
+      "entries": {
+        "external": {
+          "label": "Clients"
+        },
+        "messagebus": {
+          "label": "Load balancer"
+        },
+        "security": {
+          "label": "Health check"
+        },
+        "backend": {
+          "label": "Choice"
+        },
+        "database": {
+          "label": "Server"
+        }
+      }
+    }
+  },
+  "lanes": [
+    {
+      "id": "main",
+      "label": "Request path"
+    },
+    {
+      "id": "alt",
+      "label": "Left out"
+    }
+  ],
+  "mainPath": [
+    "c",
+    "lb",
+    "h",
+    "p",
+    "s"
+  ],
+  "nodes": [
+    {
+      "id": "c",
+      "lane": "main",
+      "col": 0,
+      "type": "external",
+      "label": "1. Clients send requests",
+      "sublabel": "A, B, C",
+      "width": 185
+    },
+    {
+      "id": "lb",
+      "lane": "main",
+      "col": 1,
+      "type": "messagebus",
+      "label": "2. Load balancer",
+      "sublabel": "receives every request",
+      "width": 185
+    },
+    {
+      "id": "h",
+      "lane": "main",
+      "col": 2,
+      "type": "security",
+      "label": "3. Skip unhealthy servers",
+      "sublabel": "health checks every few secs",
+      "width": 185
+    },
+    {
+      "id": "p",
+      "lane": "main",
+      "col": 3,
+      "type": "backend",
+      "label": "4. Pick least loaded",
+      "sublabel": "Server 1: 2 active vs 5, 9",
+      "width": 185
+    },
+    {
+      "id": "s",
+      "lane": "main",
+      "col": 4,
+      "type": "database",
+      "label": "5. Server 1 handles it",
+      "sublabel": "",
+      "width": 185
+    },
+    {
+      "id": "out",
+      "lane": "alt",
+      "col": 2,
+      "type": "security",
+      "label": "Out of rotation",
+      "sublabel": "until the server recovers",
+      "width": 185
+    }
+  ],
+  "edges": [
+    {
+      "id": "c-lb",
+      "from": "c",
+      "to": "lb",
+      "variant": "emphasis"
+    },
+    {
+      "id": "lb-h",
+      "from": "lb",
+      "to": "h",
+      "variant": "emphasis"
+    },
+    {
+      "id": "h-p",
+      "from": "h",
+      "to": "p",
+      "variant": "emphasis"
+    },
+    {
+      "id": "p-s",
+      "from": "p",
+      "to": "s",
+      "variant": "emphasis"
+    },
+    {
+      "id": "h-out",
+      "from": "h",
+      "to": "out",
+      "label": "no reply",
+      "variant": "security",
+      "role": "error"
+    }
+  ]
+}

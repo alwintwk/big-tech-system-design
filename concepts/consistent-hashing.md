@@ -12,17 +12,15 @@ This is exactly the problem Slack ran into with its Channel Servers: losing one 
 
 ## How it works (step by step, with at least 2 Mermaid diagrams)
 
-```mermaid
-flowchart TD
-  subgraph Ring["Hash ring (0 to max, wraps around)"]
-    S1["Server A<br/>hash=10"]
-    S2["Server B<br/>hash=90"]
-    S3["Server C<br/>hash=200"]
-  end
-  K1["Key: channel_183<br/>hash=45"] -->|"next server clockwise"| S2
-  K2["Key: channel_9<br/>hash=250"] -->|"wraps to lowest hash"| S1
-  K3["Key: channel_77<br/>hash=150"] -->|"next server clockwise"| S3
-```
+<a href="https://alwintwk.github.io/big-tech-system-design/diagrams/concepts-consistent-hashing-lookup.html">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../diagrams/concepts-consistent-hashing-lookup.dark.png">
+    <img alt="Steps: 1 hash the key, 2 find its spot on the ring, 3 walk clockwise to the next server, 4 that server owns the key; past the top it wraps around" src="../diagrams/concepts-consistent-hashing-lookup.light.png">
+  </picture>
+</a>
+
+
+<sub>Click the diagram for the interactive version (zoom, dark mode, trace a path).</sub>
 
 > **Why this matters:** notice that key `channel_9` (hash 250) wraps around past the highest server position back to the lowest one (Server A). The ring has no start or end — it's a genuine circle, which is exactly what makes "next server clockwise" a well-defined rule for every possible key, no matter how large its hash value is.
 

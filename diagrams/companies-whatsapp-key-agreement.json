@@ -1,0 +1,101 @@
+{
+ "schema_version": 1,
+ "diagram_type": "sequence",
+ "meta": {
+  "title": "WhatsApp: starting a session with an offline friend (X3DH)",
+  "output": "diagrams/companies-whatsapp-key-agreement.html",
+  "viewBox": [
+   1080,
+   480
+  ],
+  "column_fit": "spread",
+  "quality_profile": "showcase",
+  "legend": {
+   "entries": {
+    "default": {
+     "label": "Key lookup"
+    },
+    "emphasis": {
+     "label": "First message"
+    },
+    "return": {
+     "label": "Server reply"
+    },
+    "dashed": {
+     "label": "Queued delivery"
+    }
+   }
+  }
+ },
+ "participants": [
+  {
+   "id": "a",
+   "type": "external",
+   "label": "Device A",
+   "sublabel": "initiator"
+  },
+  {
+   "id": "srv",
+   "type": "backend",
+   "label": "WhatsApp server",
+   "sublabel": "mailbox"
+  },
+  {
+   "id": "b",
+   "type": "frontend",
+   "label": "Device B",
+   "sublabel": "offline for now"
+  }
+ ],
+ "messages": [
+  {
+   "id": "m1",
+   "from": "a",
+   "to": "srv",
+   "y": 170,
+   "label": "1. Fetch B's prekey bundle",
+   "variant": "default"
+  },
+  {
+   "id": "m2",
+   "from": "srv",
+   "to": "a",
+   "y": 198,
+   "label": "2. Identity, signed + one-time prekey",
+   "variant": "return"
+  },
+  {
+   "id": "m3",
+   "from": "a",
+   "to": "srv",
+   "y": 226,
+   "label": "3. First message + A ephemeral key",
+   "variant": "emphasis"
+  },
+  {
+   "id": "m4",
+   "from": "srv",
+   "to": "b",
+   "y": 254,
+   "label": "4. Deliver once B is online (queued)",
+   "variant": "dashed"
+  }
+ ],
+ "cards": [
+  {
+   "dot": "emerald",
+   "title": "What each side does",
+   "items": [
+    "A derives a shared secret from B prekeys (X3DH) and starts Double Ratchet",
+    "B runs X3DH with the same public values later"
+   ]
+  },
+  {
+   "dot": "orange",
+   "title": "Why it works offline",
+   "items": [
+    "B uploaded prekeys in advance"
+   ]
+  }
+ ]
+}

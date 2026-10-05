@@ -1,0 +1,160 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "URL shortener: following a short link",
+    "quality_profile": "showcase",
+    "output": "diagrams/problems-url-shortener-redirect.html",
+    "legend": {
+      "entries": {
+        "external": {
+          "label": "User"
+        },
+        "backend": {
+          "label": "Service"
+        },
+        "database": {
+          "label": "Cache / stores"
+        },
+        "messagebus": {
+          "label": "Click queue"
+        }
+      }
+    }
+  },
+  "lanes": [
+    {
+      "id": "t",
+      "label": "Analytics"
+    },
+    {
+      "id": "a",
+      "label": "Redirect path"
+    },
+    {
+      "id": "b",
+      "label": "Cache miss"
+    }
+  ],
+  "mainPath": [
+    "c",
+    "rs",
+    "ca",
+    "db",
+    "rp"
+  ],
+  "nodes": [
+    {
+      "id": "q",
+      "lane": "t",
+      "col": 1,
+      "type": "messagebus",
+      "label": "Click event queue",
+      "sublabel": "counted off the main path",
+      "width": 175
+    },
+    {
+      "id": "an",
+      "lane": "t",
+      "col": 2,
+      "type": "database",
+      "label": "Analytics store",
+      "sublabel": "",
+      "width": 175
+    },
+    {
+      "id": "c",
+      "lane": "a",
+      "col": 0,
+      "type": "external",
+      "label": "1. Click short link",
+      "sublabel": "",
+      "width": 175
+    },
+    {
+      "id": "rs",
+      "lane": "a",
+      "col": 1,
+      "type": "backend",
+      "label": "2. Redirect service",
+      "sublabel": "reached via load balancer",
+      "width": 175
+    },
+    {
+      "id": "ca",
+      "lane": "a",
+      "col": 2,
+      "type": "database",
+      "label": "3. Look up in cache",
+      "sublabel": "short_code -> long_url",
+      "width": 175
+    },
+    {
+      "id": "rp",
+      "lane": "a",
+      "col": 4,
+      "type": "external",
+      "label": "5. Send to long URL",
+      "sublabel": "",
+      "width": 175
+    },
+    {
+      "id": "db",
+      "lane": "b",
+      "col": 3,
+      "type": "database",
+      "label": "4. Miss: URL database",
+      "sublabel": "sharded by short_code",
+      "width": 175
+    }
+  ],
+  "edges": [
+    {
+      "id": "c-rs",
+      "from": "c",
+      "to": "rs",
+      "variant": "emphasis"
+    },
+    {
+      "id": "rs-ca",
+      "from": "rs",
+      "to": "ca",
+      "variant": "emphasis"
+    },
+    {
+      "id": "ca-rp",
+      "from": "ca",
+      "to": "rp",
+      "label": "hit",
+      "role": "branch"
+    },
+    {
+      "id": "ca-db",
+      "from": "ca",
+      "to": "db",
+      "label": "miss",
+      "variant": "emphasis"
+    },
+    {
+      "id": "db-rp",
+      "from": "db",
+      "to": "rp",
+      "variant": "emphasis"
+    },
+    {
+      "id": "rs-q",
+      "from": "rs",
+      "to": "q",
+      "label": "click event",
+      "variant": "dashed",
+      "role": "async"
+    },
+    {
+      "id": "q-an",
+      "from": "q",
+      "to": "an",
+      "variant": "dashed",
+      "role": "async"
+    }
+  ]
+}

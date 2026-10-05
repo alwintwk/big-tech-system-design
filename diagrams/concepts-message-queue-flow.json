@@ -1,0 +1,136 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Message queue: publish, process, remove",
+    "quality_profile": "showcase",
+    "output": "diagrams/concepts-message-queue-flow.html",
+    "legend": {
+      "entries": {
+        "external": {
+          "label": "Producer"
+        },
+        "messagebus": {
+          "label": "Queue"
+        },
+        "backend": {
+          "label": "Worker"
+        },
+        "database": {
+          "label": "Done"
+        },
+        "security": {
+          "label": "Dead-letter queue"
+        }
+      }
+    }
+  },
+  "lanes": [
+    {
+      "id": "main",
+      "label": "Normal path"
+    },
+    {
+      "id": "alt",
+      "label": "Failure"
+    }
+  ],
+  "mainPath": [
+    "p",
+    "q",
+    "w",
+    "d",
+    "x"
+  ],
+  "nodes": [
+    {
+      "id": "p",
+      "lane": "main",
+      "col": 0,
+      "type": "external",
+      "label": "1. Producer publishes",
+      "sublabel": "e.g. a web request handler",
+      "width": 185
+    },
+    {
+      "id": "q",
+      "lane": "main",
+      "col": 1,
+      "type": "messagebus",
+      "label": "2. Message waits in queue",
+      "sublabel": "until a worker is free",
+      "width": 185
+    },
+    {
+      "id": "w",
+      "lane": "main",
+      "col": 2,
+      "type": "backend",
+      "label": "3. Worker pulls it",
+      "sublabel": "worker 1 or worker 2",
+      "width": 185
+    },
+    {
+      "id": "d",
+      "lane": "main",
+      "col": 3,
+      "type": "backend",
+      "label": "4. Worker processes it",
+      "sublabel": "",
+      "width": 185
+    },
+    {
+      "id": "x",
+      "lane": "main",
+      "col": 4,
+      "type": "database",
+      "label": "5. Message removed",
+      "sublabel": "once processed",
+      "width": 185
+    },
+    {
+      "id": "dl",
+      "lane": "alt",
+      "col": 4,
+      "type": "security",
+      "label": "Dead-letter queue",
+      "sublabel": "after retries run out",
+      "width": 185
+    }
+  ],
+  "edges": [
+    {
+      "id": "p-q",
+      "from": "p",
+      "to": "q",
+      "variant": "emphasis"
+    },
+    {
+      "id": "q-w",
+      "from": "q",
+      "to": "w",
+      "variant": "emphasis"
+    },
+    {
+      "id": "w-d",
+      "from": "w",
+      "to": "d",
+      "variant": "emphasis"
+    },
+    {
+      "id": "d-x",
+      "from": "d",
+      "to": "x",
+      "label": "success",
+      "variant": "emphasis"
+    },
+    {
+      "id": "d-dl",
+      "from": "d",
+      "to": "dl",
+      "label": "fails too often",
+      "variant": "security",
+      "role": "error"
+    }
+  ]
+}

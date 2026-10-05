@@ -1,0 +1,118 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Finding the server for a key on the ring",
+    "quality_profile": "showcase",
+    "output": "diagrams/concepts-consistent-hashing-lookup.html",
+    "legend": {
+      "entries": {
+        "external": {
+          "label": "Key"
+        },
+        "database": {
+          "label": "Hash ring"
+        },
+        "backend": {
+          "label": "Walk"
+        },
+        "messagebus": {
+          "label": "Owner"
+        },
+        "security": {
+          "label": "Wrap-around"
+        }
+      }
+    }
+  },
+  "lanes": [
+    {
+      "id": "main",
+      "label": "Lookup"
+    },
+    {
+      "id": "alt",
+      "label": "Edge case"
+    }
+  ],
+  "mainPath": [
+    "k",
+    "r",
+    "w",
+    "o"
+  ],
+  "nodes": [
+    {
+      "id": "k",
+      "lane": "main",
+      "col": 0,
+      "type": "external",
+      "label": "1. Hash the key",
+      "sublabel": "channel_183 -> 45",
+      "width": 170
+    },
+    {
+      "id": "r",
+      "lane": "main",
+      "col": 1,
+      "type": "database",
+      "label": "2. Find its spot on ring",
+      "sublabel": "servers sit at 10, 90, 200",
+      "width": 170
+    },
+    {
+      "id": "w",
+      "lane": "main",
+      "col": 2,
+      "type": "backend",
+      "label": "3. Walk clockwise",
+      "sublabel": "to the next server",
+      "width": 170
+    },
+    {
+      "id": "o",
+      "lane": "main",
+      "col": 3,
+      "type": "messagebus",
+      "label": "4. That server owns it",
+      "sublabel": "Server B (hash 90)",
+      "width": 170
+    },
+    {
+      "id": "wrap",
+      "lane": "alt",
+      "col": 3,
+      "type": "security",
+      "label": "Past the top? wrap around",
+      "sublabel": "channel_9 (250) -> Server A (10)",
+      "width": 170
+    }
+  ],
+  "edges": [
+    {
+      "id": "k-r",
+      "from": "k",
+      "to": "r",
+      "variant": "emphasis"
+    },
+    {
+      "id": "r-w",
+      "from": "r",
+      "to": "w",
+      "variant": "emphasis"
+    },
+    {
+      "id": "w-o",
+      "from": "w",
+      "to": "o",
+      "variant": "emphasis"
+    },
+    {
+      "id": "w-wrap",
+      "from": "w",
+      "to": "wrap",
+      "label": "no server ahead",
+      "role": "branch"
+    }
+  ]
+}

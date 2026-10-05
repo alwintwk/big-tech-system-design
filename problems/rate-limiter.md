@@ -143,15 +143,15 @@ doesn't need replication or durability guarantees anywhere near what user data n
 
 ## 5. High-level design
 
-```mermaid
-flowchart LR
-  Client[Client] --> Gateway[API gateway]
-  Gateway --> Limiter{Rate limiter}
-  Limiter -->|"allowed"| Service[Backend service]
-  Limiter -->|"rejected"| Reject[429 response]
-  Limiter <--> Store[(Shared counter store<br/>e.g. Redis, sharded)]
-  Service --> DB[(Business data)]
-```
+<a href="https://alwintwk.github.io/big-tech-system-design/diagrams/problems-rate-limiter-request.html">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../diagrams/problems-rate-limiter-request.dark.png">
+    <img alt="Steps: 1 client request, 2 API gateway, 3 rate limiter checks shared counter store; allowed goes to 4 backend service and 5 business data, rejected gets 429" src="../diagrams/problems-rate-limiter-request.light.png">
+  </picture>
+</a>
+
+
+<sub>Click the diagram for the interactive version (zoom, dark mode, trace a path).</sub>
 
 Walkthrough:
 

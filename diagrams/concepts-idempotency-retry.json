@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "Idempotency key: a safe retry",
+    "output": "diagrams/concepts-idempotency-retry.html",
+    "viewBox": [
+      1020,
+      595
+    ],
+    "column_fit": "spread",
+    "quality_profile": "showcase",
+    "legend": {
+      "entries": {
+        "default": {
+          "label": "Request"
+        },
+        "emphasis": {
+          "label": "Client call"
+        },
+        "return": {
+          "label": "Reply"
+        }
+      }
+    }
+  },
+  "participants": [
+    {
+      "id": "c",
+      "type": "external",
+      "label": "Client",
+      "sublabel": "retries on failure"
+    },
+    {
+      "id": "s",
+      "type": "backend",
+      "label": "Server",
+      "sublabel": "charges the card"
+    },
+    {
+      "id": "k",
+      "type": "database",
+      "label": "Key store",
+      "sublabel": "remembers keys"
+    }
+  ],
+  "segments": [
+    {
+      "from": 171,
+      "to": 329,
+      "label": "First try"
+    },
+    {
+      "from": 361,
+      "to": 489,
+      "label": "Response lost, client retries"
+    }
+  ],
+  "messages": [
+    {
+      "id": "m1",
+      "from": "c",
+      "to": "s",
+      "y": 195,
+      "label": "1. POST /charge (key=abc-123)",
+      "variant": "emphasis"
+    },
+    {
+      "id": "m2",
+      "from": "s",
+      "to": "k",
+      "y": 225,
+      "label": "2. seen abc-123 before?",
+      "variant": "default"
+    },
+    {
+      "id": "m3",
+      "from": "k",
+      "to": "s",
+      "y": 255,
+      "label": "3. no",
+      "variant": "return"
+    },
+    {
+      "id": "m4",
+      "from": "s",
+      "to": "k",
+      "y": 285,
+      "label": "4. save result for abc-123",
+      "variant": "default"
+    },
+    {
+      "id": "m5",
+      "from": "s",
+      "to": "c",
+      "y": 315,
+      "label": "5. 200 OK (charged)",
+      "variant": "return"
+    },
+    {
+      "id": "m6",
+      "from": "c",
+      "to": "s",
+      "y": 385,
+      "label": "6. retry: same key abc-123",
+      "variant": "emphasis"
+    },
+    {
+      "id": "m7",
+      "from": "s",
+      "to": "k",
+      "y": 415,
+      "label": "7. seen abc-123 before?",
+      "variant": "default"
+    },
+    {
+      "id": "m8",
+      "from": "k",
+      "to": "s",
+      "y": 445,
+      "label": "8. yes: stored result",
+      "variant": "return"
+    },
+    {
+      "id": "m9",
+      "from": "s",
+      "to": "c",
+      "y": 475,
+      "label": "9. 200 OK (replayed, NOT charged again)",
+      "variant": "return"
+    }
+  ]
+}

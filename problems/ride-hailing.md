@@ -161,21 +161,15 @@ trip and fare records live in `RIDE`; location is a live, disposable value.
 
 ## 5. High-level design
 
-```mermaid
-flowchart LR
-  RiderApp[Rider app] --> API[API gateway]
-  DriverApp[Driver app] -->|"location ping, ~every 4s"| LocIngest[Location ingest service]
+<a href="https://alwintwk.github.io/big-tech-system-design/diagrams/problems-ride-hailing-match.html">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../diagrams/problems-ride-hailing-match.dark.png">
+    <img alt="Steps: 1 rider asks for a ride, 2 ride service records it, 3 dispatch finds nearby drivers in the geo-index, 4 driver assigned, 5 push update to rider and driver apps; driver location pings update the geo-index separately" src="../diagrams/problems-ride-hailing-match.light.png">
+  </picture>
+</a>
 
-  API --> RideSvc[Ride service]
-  RideSvc --> RideDB[(Ride store)]
-  RideSvc --> Dispatch[Dispatch / matching service]
 
-  LocIngest --> GeoIndex[(Geo-index<br/>in-memory, cell-based)]
-  Dispatch --> GeoIndex
-  Dispatch -->|"assigns driver"| RideSvc
-  RideSvc -->|"push update"| RiderApp
-  RideSvc -->|"push update"| DriverApp
-```
+<sub>Click the diagram for the interactive version (zoom, dark mode, trace a path).</sub>
 
 Walkthrough:
 

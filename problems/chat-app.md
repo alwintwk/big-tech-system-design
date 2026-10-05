@@ -177,18 +177,15 @@ rewriting the whole conversation row.
 
 ## 5. High-level design
 
-```mermaid
-flowchart LR
-  ClientA[Sender's device] -->|"persistent connection"| GW1[Gateway server 1]
-  GW1 --> Presence[(Presence registry<br/>user_id to gateway)]
-  GW1 --> MQ[[Message queue]]
-  MQ --> Store[(Message store<br/>sharded by conversation_id)]
-  MQ --> Router[Fan-out router]
-  Router --> Presence
-  Router -->|"recipient online"| GW2[Gateway server 2]
-  GW2 -->|"persistent connection"| ClientB[Recipient's device]
-  Router -->|"recipient offline"| Offline[[Offline delivery queue]]
-```
+<a href="https://alwintwk.github.io/big-tech-system-design/diagrams/problems-chat-app-send-message.html">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../diagrams/problems-chat-app-send-message.dark.png">
+    <img alt="Steps: 1 sender device sends, 2 gateway 1 queues, 3 message queue (and saves to message store), 4 fan-out router checks presence registry, 5 gateway 2, 6 recipient device; offline recipients go to the offline queue" src="../diagrams/problems-chat-app-send-message.light.png">
+  </picture>
+</a>
+
+
+<sub>Click the diagram for the interactive version (zoom, dark mode, trace a path).</sub>
 
 Walkthrough:
 

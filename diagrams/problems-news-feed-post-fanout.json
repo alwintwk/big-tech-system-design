@@ -1,0 +1,152 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "News feed: what happens when someone posts",
+    "quality_profile": "showcase",
+    "output": "diagrams/problems-news-feed-post-fanout.html",
+    "legend": {
+      "entries": {
+        "external": {
+          "label": "Client"
+        },
+        "backend": {
+          "label": "Services"
+        },
+        "messagebus": {
+          "label": "Queue"
+        },
+        "database": {
+          "label": "Stores"
+        },
+        "security": {
+          "label": "Celebrity case"
+        }
+      }
+    }
+  },
+  "lanes": [
+    {
+      "id": "a",
+      "label": "Post path"
+    },
+    {
+      "id": "b",
+      "label": "Side effects"
+    }
+  ],
+  "mainPath": [
+    "c",
+    "ps",
+    "fq",
+    "fw",
+    "tl"
+  ],
+  "nodes": [
+    {
+      "id": "c",
+      "lane": "a",
+      "col": 0,
+      "type": "external",
+      "label": "1. Client posts",
+      "sublabel": "new post",
+      "width": 165
+    },
+    {
+      "id": "ps",
+      "lane": "a",
+      "col": 1,
+      "type": "backend",
+      "label": "2. Post service",
+      "sublabel": "saves, then queues",
+      "width": 165
+    },
+    {
+      "id": "fq",
+      "lane": "a",
+      "col": 2,
+      "type": "messagebus",
+      "label": "3. Fan-out queue",
+      "sublabel": "post never waits on it",
+      "width": 165
+    },
+    {
+      "id": "fw",
+      "lane": "a",
+      "col": 3,
+      "type": "backend",
+      "label": "4. Fan-out worker",
+      "sublabel": "checks follower count",
+      "width": 165
+    },
+    {
+      "id": "tl",
+      "lane": "a",
+      "col": 4,
+      "type": "database",
+      "label": "5. Push to timelines",
+      "sublabel": "followers' cache",
+      "width": 165
+    },
+    {
+      "id": "pdb",
+      "lane": "b",
+      "col": 1,
+      "type": "database",
+      "label": "Post store",
+      "sublabel": "sharded by author_id",
+      "width": 165
+    },
+    {
+      "id": "sk",
+      "lane": "b",
+      "col": 4,
+      "type": "security",
+      "label": "Skip the push",
+      "sublabel": "merged at read time",
+      "width": 165
+    }
+  ],
+  "edges": [
+    {
+      "id": "c-ps",
+      "from": "c",
+      "to": "ps",
+      "variant": "emphasis"
+    },
+    {
+      "id": "ps-fq",
+      "from": "ps",
+      "to": "fq",
+      "variant": "emphasis"
+    },
+    {
+      "id": "fq-fw",
+      "from": "fq",
+      "to": "fw",
+      "variant": "emphasis"
+    },
+    {
+      "id": "fw-tl",
+      "from": "fw",
+      "to": "tl",
+      "label": "under threshold",
+      "variant": "emphasis"
+    },
+    {
+      "id": "ps-pdb",
+      "from": "ps",
+      "to": "pdb",
+      "label": "durable write",
+      "role": "branch"
+    },
+    {
+      "id": "fw-sk",
+      "from": "fw",
+      "to": "sk",
+      "label": "over threshold",
+      "variant": "security",
+      "role": "error"
+    }
+  ]
+}

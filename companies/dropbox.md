@@ -332,27 +332,14 @@ Walking through it:
 
 ### 1. Upload a changed file (block hashing + dedupe)
 
-```mermaid
-sequenceDiagram
-  participant User
-  participant Nucleus as Sync engine (Nucleus)
-  participant Meta as Metadata service (Edgestore)
-  participant BlockSvc as Block server
-  participant MP as Magic Pocket
+<a href="https://alwintwk.github.io/big-tech-system-design/diagrams/companies-dropbox-upload.html">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../diagrams/companies-dropbox-upload.dark.png">
+    <img alt="Steps: 1. Save file (split into 4MB blocks, hash each); 2. Which block hashes exist already?; 3. Hashes already known; 4. Upload only missing blocks; 5. Write block (hash verified); 6. Ack when durable; 7. Block stored; 8. Commit new file revision; 9. Revision committed; 10. Notify other devices" src="../diagrams/companies-dropbox-upload.light.png">
+  </picture>
+</a>
 
-  User->>Nucleus: Save or modify a file locally
-  Nucleus->>Nucleus: Split file into 4MB blocks, SHA-256 each block
-  Nucleus->>Meta: Ask which of these block hashes already exist
-  Meta-->>Nucleus: Return hashes already known for this account
-  Nucleus->>BlockSvc: Upload only the missing blocks, Brotli-compressed
-  BlockSvc->>BlockSvc: Decompress, verify hash matches claimed hash
-  BlockSvc->>MP: Write new block into an open bucket
-  MP-->>BlockSvc: Ack once durable across replicated or erasure-coded fragments
-  BlockSvc-->>Nucleus: Ack block stored
-  Nucleus->>Meta: Commit new file revision, hash list + metadata
-  Meta-->>Nucleus: Revision committed
-  Meta-)Nucleus: Change notification fanned out to other devices
-```
+<sub>Click the diagram for the interactive version (zoom, dark mode, trace a path).</sub>
 
 The dedupe check is the whole point: if two blocks hash the same, Dropbox treats them as the same content and skips the upload entirely — and because the hash is a pure function of the bytes and nothing else, that holds whether the duplicate came from an older version of the same file or a completely different user's file [12](#sources). Blocks are compressed client-side with a modified Brotli encoder Dropbox calls **Broccoli** before the trip over the wire; the server decompresses and re-checks the hash so a client can't claim a hash that doesn't match the bytes it actually sends [8](#sources).
 

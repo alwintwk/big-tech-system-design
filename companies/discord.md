@@ -405,26 +405,14 @@ Walking through it:
 
 ### 1. Core flow: sending a message in a large guild
 
-```mermaid
-sequenceDiagram
-  participant C as Client
-  participant API as HTTP API, Python
-  participant DS as Message data service, Rust
-  participant SCY as ScyllaDB
-  participant G as Guild process, Elixir
-  participant MF as Manifold router
-  participant S as Session process, per user
+<a href="https://alwintwk.github.io/big-tech-system-design/diagrams/companies-discord-send-message.html">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../diagrams/companies-discord-send-message.dark.png">
+    <img alt="Steps: 1. POST channel message; 2. Save message (gRPC); 3. Insert by channel + time bucket; 4. OK; 5. Message ID (Snowflake); 6. Publish MESSAGE_CREATE; 7. Fan out to remote nodes; 8. Local delivery per node; 9. WebSocket push" src="../diagrams/companies-discord-send-message.light.png">
+  </picture>
+</a>
 
-  C->>API: POST channel messages
-  API->>DS: Persist message, gRPC
-  DS->>SCY: Insert by channel id, time bucket, message id
-  SCY-->>DS: OK
-  DS-->>API: message id, Snowflake
-  API->>G: Publish MESSAGE_CREATE event
-  G->>MF: Fan out to remote nodes
-  MF->>S: Local delivery per node
-  S-->>C: WebSocket push, MESSAGE_CREATE
-```
+<sub>Click the diagram for the interactive version (zoom, dark mode, trace a path).</sub>
 
 The step that matters most here is the hop from `G->>MF`: the guild process publishes the event **once**, to Manifold, rather than iterating over every member itself.
 

@@ -1,0 +1,160 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "Stripe: one safe payment (new idempotency key)",
+    "output": "diagrams/companies-stripe-payment.html",
+    "viewBox": [
+      1080,
+      526
+    ],
+    "column_fit": "spread",
+    "quality_profile": "showcase",
+    "legend": {
+      "entries": {
+        "default": {
+          "label": "Internal call"
+        },
+        "emphasis": {
+          "label": "Request / auth"
+        },
+        "security": {
+          "label": "Idempotency check"
+        },
+        "return": {
+          "label": "Reply"
+        }
+      }
+    }
+  },
+  "participants": [
+    {
+      "id": "c",
+      "type": "external",
+      "label": "Merchant client",
+      "sublabel": "sends the request"
+    },
+    {
+      "id": "gw",
+      "type": "backend",
+      "label": "API gateway",
+      "sublabel": "entry"
+    },
+    {
+      "id": "ik",
+      "type": "database",
+      "label": "Idempotency store",
+      "sublabel": "remembers keys"
+    },
+    {
+      "id": "p",
+      "type": "backend",
+      "label": "Payments service",
+      "sublabel": "PaymentIntent"
+    },
+    {
+      "id": "n",
+      "type": "external",
+      "label": "Card network",
+      "sublabel": "bank side"
+    },
+    {
+      "id": "l",
+      "type": "database",
+      "label": "Ledger",
+      "sublabel": "double-entry"
+    }
+  ],
+  "messages": [
+    {
+      "id": "m1",
+      "from": "c",
+      "to": "gw",
+      "y": 170,
+      "label": "1. POST /v1/payment_intents (key K)",
+      "variant": "emphasis"
+    },
+    {
+      "id": "m2",
+      "from": "gw",
+      "to": "ik",
+      "y": 198,
+      "label": "2. Look up key K",
+      "variant": "security"
+    },
+    {
+      "id": "m3",
+      "from": "ik",
+      "to": "gw",
+      "y": 226,
+      "label": "3. Unseen: row inserted + locked",
+      "variant": "return"
+    },
+    {
+      "id": "m4",
+      "from": "gw",
+      "to": "p",
+      "y": 254,
+      "label": "4. Process PaymentIntent",
+      "variant": "default"
+    },
+    {
+      "id": "m5",
+      "from": "p",
+      "to": "n",
+      "y": 282,
+      "label": "5. Authorize card",
+      "variant": "emphasis"
+    },
+    {
+      "id": "m6",
+      "from": "n",
+      "to": "p",
+      "y": 310,
+      "label": "6. Approved",
+      "variant": "return"
+    },
+    {
+      "id": "m7",
+      "from": "p",
+      "to": "l",
+      "y": 338,
+      "label": "7. Write balanced entry",
+      "variant": "default"
+    },
+    {
+      "id": "m8",
+      "from": "l",
+      "to": "p",
+      "y": 366,
+      "label": "8. Committed",
+      "variant": "return"
+    },
+    {
+      "id": "m9",
+      "from": "p",
+      "to": "ik",
+      "y": 394,
+      "label": "9. Save result, unlock key",
+      "variant": "default"
+    },
+    {
+      "id": "m10",
+      "from": "p",
+      "to": "c",
+      "y": 422,
+      "label": "10. 200 succeeded (via gateway)",
+      "variant": "return"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "rose",
+      "title": "If key K was seen",
+      "items": [
+        "Finished: same response replayed",
+        "In progress: 409, retry shortly"
+      ]
+    }
+  ]
+}

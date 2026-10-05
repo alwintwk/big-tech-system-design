@@ -309,34 +309,14 @@ Notice that the upload path (steps 1–4) and the playback path (steps 1, 2, 6) 
 
 ### 1. Core flow: upload to playable
 
-```mermaid
-sequenceDiagram
-    actor Creator
-    participant Upload as Upload Service
-    participant Raw as Colossus Raw Store
-    participant Queue as Transcode Job Queue
-    participant Farm as Transcoder Fleet
-    participant Store as Colossus Encoded Store
-    participant Meta as Vitess MySQL Metadata
-    actor Viewer
-    participant Edge as CDN Edge (GGC)
+<a href="https://alwintwk.github.io/big-tech-system-design/diagrams/companies-youtube-upload-to-play.html">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../diagrams/companies-youtube-upload-to-play.dark.png">
+    <img alt="Steps: 1. Upload in chunks; 2. Write raw video; 3. Insert video row (processing); 4. Enqueue transcode job; 5. Fan out per resolution/codec; 6. Read raw video; 7. Update status (public when ready); 8. Request video (DASH manifest); 9. Cache miss: fetch segments from store; 10. Stream adaptive-bitrate video" src="../diagrams/companies-youtube-upload-to-play.light.png">
+  </picture>
+</a>
 
-    Creator->>Upload: Resumable upload in 256KB+ chunks
-    Upload->>Raw: Write raw video file
-    Upload->>Meta: Insert video row, status = processing
-    Upload->>Queue: Enqueue transcode job
-    Queue->>Farm: Dispatch fan-out tasks per resolution and codec
-    Farm->>Raw: Read raw video
-    Farm->>Store: Write each rendition, e.g. 1080p VP9
-    Farm->>Store: Write thumbnail and storyboard sprite
-    Farm->>Meta: Update status per rendition
-    Meta-->>Upload: Enough renditions ready, status = public
-    Viewer->>Edge: Request video, ask for DASH manifest
-    Edge->>Meta: Cache miss: fetch manifest and metadata
-    Edge->>Store: Cache miss: fetch rendition segments
-    Store-->>Edge: Return segments
-    Edge-->>Viewer: Stream adaptive-bitrate video
-```
+<sub>Click the diagram for the interactive version (zoom, dark mode, trace a path).</sub>
 
 Step by step: the creator's file arrives over a **resumable upload** protocol — chunks that must be a multiple of 256 KB, with the server able to say "I only received this many bytes, resend from there" if the connection drops [13]. The raw bytes hit durable storage before any processing starts, so a transcoder crash never loses the source.
 

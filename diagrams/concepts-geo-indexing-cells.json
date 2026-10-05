@@ -1,0 +1,135 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Geo-index: from GPS point to nearby drivers",
+    "quality_profile": "showcase",
+    "output": "diagrams/concepts-geo-indexing-cells.html",
+    "legend": {
+      "entries": {
+        "external": {
+          "label": "Driver / rider"
+        },
+        "backend": {
+          "label": "Cell mapping"
+        },
+        "database": {
+          "label": "Geo-index"
+        },
+        "messagebus": {
+          "label": "Result"
+        }
+      }
+    }
+  },
+  "lanes": [
+    {
+      "id": "d",
+      "label": "Driver updates"
+    },
+    {
+      "id": "i",
+      "label": "Shared index"
+    },
+    {
+      "id": "r",
+      "label": "Rider request"
+    }
+  ],
+  "mainPath": [
+    "req",
+    "look",
+    "idx",
+    "cand"
+  ],
+  "nodes": [
+    {
+      "id": "gps",
+      "lane": "d",
+      "col": 0,
+      "type": "external",
+      "label": "1. Driver GPS ping",
+      "sublabel": "raw lat, lng",
+      "width": 185
+    },
+    {
+      "id": "cell",
+      "lane": "d",
+      "col": 1,
+      "type": "backend",
+      "label": "2. Map to a cell ID",
+      "sublabel": "H3 hexagon",
+      "width": 185
+    },
+    {
+      "id": "idx",
+      "lane": "i",
+      "col": 2,
+      "type": "database",
+      "label": "Geo-index",
+      "sublabel": "cell ID -> drivers in it",
+      "width": 185
+    },
+    {
+      "id": "req",
+      "lane": "r",
+      "col": 0,
+      "type": "external",
+      "label": "3. Rider requests a trip",
+      "sublabel": "has its own cell ID",
+      "width": 185
+    },
+    {
+      "id": "look",
+      "lane": "r",
+      "col": 1,
+      "type": "backend",
+      "label": "4. Look up own cell + ring",
+      "sublabel": "plus neighboring cells",
+      "width": 185
+    },
+    {
+      "id": "cand",
+      "lane": "r",
+      "col": 3,
+      "type": "messagebus",
+      "label": "5. Small candidate list",
+      "sublabel": "nearby drivers only",
+      "width": 185
+    }
+  ],
+  "edges": [
+    {
+      "id": "gps-cell",
+      "from": "gps",
+      "to": "cell",
+      "variant": "emphasis"
+    },
+    {
+      "id": "cell-idx",
+      "from": "cell",
+      "to": "idx",
+      "label": "save driver in cell",
+      "role": "branch"
+    },
+    {
+      "id": "req-look",
+      "from": "req",
+      "to": "look",
+      "variant": "emphasis"
+    },
+    {
+      "id": "look-idx",
+      "from": "look",
+      "to": "idx",
+      "label": "read cells",
+      "variant": "emphasis"
+    },
+    {
+      "id": "idx-cand",
+      "from": "idx",
+      "to": "cand",
+      "variant": "emphasis"
+    }
+  ]
+}

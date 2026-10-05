@@ -12,25 +12,15 @@ This matters for anything that has to feel instant — a chat message, a live no
 
 ## How it works (step by step, with at least 2 Mermaid diagrams)
 
-```mermaid
-sequenceDiagram
-  participant C as Client
-  participant S as Server
+<a href="https://alwintwk.github.io/big-tech-system-design/diagrams/concepts-persistent-connections-ws.html">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../diagrams/concepts-persistent-connections-ws.dark.png">
+    <img alt="Sequence: short polling 1 anything new, 2 no, 3 ask again, 4 yes; WebSocket 5 upgrade, 6 connection established, 7 server pushes, 8 client sends, all on one connection" src="../diagrams/concepts-persistent-connections-ws.light.png">
+  </picture>
+</a>
 
-  Note over C,S: Short polling: client repeatedly asks
-  C->>S: "anything new?"
-  S-->>C: "no"
-  C->>S: "anything new?" (a few seconds later)
-  S-->>C: "no"
-  C->>S: "anything new?"
-  S-->>C: "yes! here it is" (already stale by the time it's asked)
 
-  Note over C,S: WebSocket: one connection stays open, either side can send
-  C->>S: upgrade HTTP connection to WebSocket
-  S-->>C: connection established
-  S--)C: push new event (no request needed)
-  C--)S: send a message (no new connection needed)
-```
+<sub>Click the diagram for the interactive version (zoom, dark mode, trace a path).</sub>
 
 > **Why this matters:** in the polling version, the *timing* of when the client happens to ask is what determines how stale the news can be — worse polling frequency means worse staleness, but also more wasted "no" answers. The WebSocket version has no such trade-off: the server sends the instant it has something, full stop.
 
